@@ -22,9 +22,9 @@ class ManageFeeController extends Controller
                     }, 'additional_fee' => function ($query) {
                         $query->where('status', 1);
                     }])
-                    // ->orderBy('grade', 'ASC')
                     ->get();
         $Grade = Grade::all();
+        // return json_encode($Grade_Tuition);
         return view('admin.manage_fees.index', ['Grade_Tuition' => $Grade_Tuition, 'Grade' => $Grade]);
     }
 

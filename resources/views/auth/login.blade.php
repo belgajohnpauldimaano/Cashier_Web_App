@@ -1,13 +1,13 @@
 @extends('layouts.auth_layout')
 
 @section('content')
-  <p class="login-box-msg">Sign in to manage films</p>
+  <p class="login-box-msg">Sign in</p>
     {{-- {{ bcrypt('123456') }} --}}
     <form action="{{ route('login') }}" method="post">
     {{ csrf_field() }}
       <div class="form-group has-feedback {{ $errors->has('email') ? ' has-error' : '' }}">
-        <input type="email" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}" required autofocus>
-        <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+        <input type="text" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}" required autofocus>
+        <span class="glyphicon glyphicon-user form-control-feedback"></span>
 
         @if ($errors->has('email'))
             <span class="help-block text-center">

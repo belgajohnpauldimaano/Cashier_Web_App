@@ -27,7 +27,7 @@
 <body class="hold-transition login-page">
 <div class="login-box">
   <div class="login-logo">
-    <a href="../../index2.html"><b>TBA</b>CMS</a>
+    <a href="../../index2.html"><b>UNC</b>Bataan</a>
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">

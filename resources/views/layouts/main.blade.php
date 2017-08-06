@@ -67,19 +67,28 @@
           <!-- User Account: style can be found in dropdown.less -->
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-              <img src="dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span class="hidden-xs">System Administrator</span>
+              {{--  <img src="dist/img/user2-160x160.jpg" class="user-image" alt="User Image">  --}}
+              <span class="hidden-xs">
+                {{ Auth::user()->first_name . ' ' . Auth::user()->last_name }} |
+                @if (Auth::user()->role == 1)
+                  System Administrator
+                @elseif (Auth::user()->role == 2)
+                  Cashier
+                @elseif (Auth::user()->role == 3)
+                  Accounting
+                @endif
+              </span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
-              <li class="user-header">
+              {{--  <li class="user-header">
                 <img src="dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                 <p>
                   Administrator
                   <small></small>
                 </p>
-              </li>
+              </li>  --}}
               <!-- Menu Body -->
               {{-- <li class="user-body">
                 <div class="row">
@@ -98,10 +107,17 @@
               <!-- Menu Footer-->
               <li class="user-footer">
                 <div class="pull-left">
-                  <a href="#" class="btn btn-default btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                  <a href="#" class="btn btn-default btn-flat">Profile</a>
+                  <a href="{{ route('logout') }}"
+                              onclick="event.preventDefault();
+                                        document.getElementById('logout-form').submit();"
+                              class="btn btn-default btn-flat" class="btn btn-default btn-flat">Sign out</a>
+
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                        {{ csrf_field() }}
+                    </form>
                 </div>
               </li>
             </ul>
@@ -140,11 +156,18 @@
             <i class="fa fa-circle-o text-red"></i> <span>Dashboard</span>
           </a>
         </li>  --}}
-        <li class="film"><a href="{{ route('admin.manage_student.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Students</span></a></li>
-        <li class="film"><a href="{{ route('cashier.student_payment.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Student Payment</span></a></li>
-        <li class="film"><a href="{{ route('admin.manage_fees.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Fees</span></a></li>
-        <li class="film"><a href="{{ route('reports.receivedpayments.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Received Payments</span></a></li> 
-        <li class="film"><a href="{{ route('reports.monthly_payment_monitor.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Monthly Payment Monitor</span></a></li> 
+        @if (Auth::user()->role == 1)
+          <li class="film"><a href="{{ route('admin.manage_student.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Students</span></a></li>
+          <li class="film"><a href="{{ route('admin.manage_fees.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Fees</span></a></li>
+          <li class="film"><a href="{{ route('admin.manage_discounts.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Discounts</span></a></li>
+        @elseif (Auth::user()->role == 2)
+            <li class="film"><a href="{{ route('cashier.student_payment.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Student Payment</span></a></li>
+            <li class="film"><a href="{{ route('reports.receivedpayments.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Received Payments</span></a></li> 
+            <li class="film"><a href="{{ route('reports.monthly_payment_monitor.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Monthly Payment Monitor</span></a></li> 
+        @elseif (Auth::user()->role == 3)
+          <li class="film"><a href="{{ route('reports.receivedpayments.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Received Payments</span></a></li> 
+          <li class="film"><a href="{{ route('reports.monthly_payment_monitor.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Monthly Payment Monitor</span></a></li> 
+        @endif
         
       </ul>
     </section>

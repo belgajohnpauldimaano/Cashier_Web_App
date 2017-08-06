@@ -20,7 +20,7 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::group(['prefix' => 'manage-student'], function () {
         Route::get('', 'Admin\StudentController@index')->name('admin.manage_student.index');
         Route::post('form-modal', 'Admin\StudentController@form_modal')->name('admin.manage_student.form_modal');
@@ -36,12 +36,19 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('list', 'Admin\ManageFeeController@list')->name('admin.manage_fees.list');
         
     });
+    Route::group(['prefix' => 'manage-discounts'], function () {
+        Route::get('', 'Admin\ManageDiscountsController@index')->name('admin.manage_discounts.index');
+        Route::post('list', 'Admin\ManageDiscountsController@list')->name('admin.manage_discounts.list');
+        Route::post('form-modal', 'Admin\ManageDiscountsController@form_modal')->name('admin.manage_discounts.form_modal');
+        Route::post('save-data', 'Admin\ManageDiscountsController@save_data')->name('admin.manage_discounts.save_data');
+        
+    });
 });
 
         Route::get('test_data', 'Admin\StudentController@test_data')->name('admin.manage_student.test_data');
 
 
-Route::group(['prefix' => 'cashier'], function () {
+Route::group(['prefix' => 'cashier', 'middleware' => 'auth'], function () {
     Route::group(['prefix' => 'student-payment'], function () {
         Route::get('', 'Cashier\StudentPaymentController@index')->name('cashier.student_payment.index');
         Route::post('show-form-modal-pay-tuition', 'Cashier\StudentPaymentController@show_form_modal_pay_tuition')->name('cashier.student_payment.show_form_modal_pay_tuition');
@@ -54,7 +61,7 @@ Route::group(['prefix' => 'cashier'], function () {
 
 });
 
-Route::group(['prefix' => 'reports'], function () {
+Route::group(['prefix' => 'reports', 'middleware' => 'auth'], function () {
     Route::group(['prefix' => 'received-payment'], function () {
         Route::get('', 'Reports\ReceivedPaymentsController@index')->name('reports.receivedpayments.index');
         Route::post('list', 'Reports\ReceivedPaymentsController@list')->name('reports.receivedpayments.list');

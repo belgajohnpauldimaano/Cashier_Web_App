@@ -1,47 +1,33 @@
 @extends('layouts.main')
 
-@section('content_title', 'Manage Fees')
+@section('content_title', 'Manage Discounts')
 
 @section ('content')
-
+    <div class=" pull-right">
+        <button class="btn btn-primary btn-flat js-create_new_discount"><i class="fa fa-plus"></i> Add new Discount Information</button>
+    </div>
     <div class="clearfix margin"></div>
     <div class="box box-solid">
         <div class="box-body">
             
-             <div class="filters">
+            <div class="filters">
                 <form action="" id="search">
                     {{ csrf_field() }}
                     <div class="row">
-                        {{--  <div class="col-sm-12 col-md-3 col-lg-3"> 
+                        <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
                                 <label for="">Search</label>
                                 <input type="text" id="search_filter" name="search_filter" class="form-control js-search_filters">
                             </div>
-                        </div>  --}}
+                        </div>
                         <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
-                                <label for="">Grade</label>
-                                <select name="filter_grade" id="filter_grade" class="form-control js-search_filters">
-                                    <option value="">All</option>
-                                    @if($Grade)
-                                        @foreach ($Grade as $data)
-                                            <option value="{{ $data->id }}">{{ $data->grade }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
-                            </div>
-                        </div>
-                        {{--  <div class="col-sm-12 col-md-3 col-lg-3"> 
-                            <div class="form-group">
-                                <label for="">Section</label>
-                                <select name="filter_section" id="filter_section" class="form-control js-search_filters">
-                                    <option value="">All</option>
-                                    @if($Section)
-                                        @foreach ($Section as $data)
-                                            <option value="{{ $data->id }}">{{ $data->section_name }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
+                                <label for="">&nbsp; </label>
+                                <div class="input-group">
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-flat btn-primary js-btn_search">Search</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-sm-12 col-md-3 col-lg-3 pull-right"> 
@@ -58,45 +44,30 @@
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                        </div>  --}}
+                        </div>
                     </div>
                 </form>
-            </div> 
+            </div>
 
             <div class="js-content_holder box box-solid">
                 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
+                <div class="pull-right">
+                    {{ $Discount->links('admin.manage_student.partials.student_data_list_pagination') }}
+                </div>
                 <table class="table table-bordered">
                     <tr>
-                        <th>Grade</th>
-                        <th>Tuition Fee</th>
-                        <th>Miscallenous Fee</th>
-                        <th>Other Fees</th>
+                        <th>Discount Title</th>
+                        <th>Amount</th>
                         <th>Actions</th>
                     </tr>
                     <tbody>
-                        @foreach ($Grade_Tuition as $data)
+                        @foreach ($Discount as $data)
                             <tr>
                                 <td>
-                                    {{ $data->grade }}
+                                    {{ $data->discount_title }}
                                 </td>
                                 <td>
-                                    @if ($data->tuition_fee)
-                                        &#8369; {{ a_number_format($data->tuition_fee[0]->tuition_fee) }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($data->tuition_fee)
-                                        &#8369; {{ a_number_format($data->tuition_fee[0]->misc_fee) }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @if ($data->tuition_fee)
-                                        <?php $additional_fee = 0; ?>
-                                        @foreach ($data->additional_fee as $add_fee)
-                                            <?php $additional_fee += $add_fee->additional_amount; ?>
-                                        @endforeach
-                                        &#8369; {{ a_number_format($additional_fee) }}
-                                    @endif
+                                    &#8369; {{ a_number_format($data->discount_amount) }}
                                 </td>
                                 <td>
                                     <div class="input-group-btn">
@@ -104,8 +75,8 @@
                                             <span class="fa fa-bars"></span>
                                         </button>
                                         <ul class="dropdown-menu">
-                                             <li><a href="#" class="js-edit_fees" data-id="{{ $data->id }}"><i class="fa fa-pencil"></i>Edit</a></li> 
-                                            {{--  <li><a href="#" class="js-delete_student_info" data-id="{{ $student->id }}"><i class="fa fa-trash"></i>Delete</a></li>  --}}
+                                            <li><a href="#" class="js-edit_discount_info" data-id="{{ $data->id }}"><i class="fa fa-pencil"></i>Edit</a></li>
+                                            <li><a href="#" class="js-delete_discount_info" data-id="{{ $data->id }}"><i class="fa fa-trash"></i>Delete</a></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -121,9 +92,9 @@
 
 @section ('scripts')
     <script>
-        $('body').on('click', '.js-create_new_student', function () {
+        $('body').on('click', '.js-create_new_discount', function () {
             show_form_modal({
-                url         : "{{ route('admin.manage_student.form_modal') }}",
+                url         : "{{ route('admin.manage_discounts.form_modal') }}",
                 reqData     : {
                                 _token  : '{{ csrf_token() }}'
                             },
@@ -133,7 +104,7 @@
 
         });
 
-        $('body').on('click', '.js-edit_fees', function (e) {
+        $('body').on('click', '.js-edit_discount_info', function (e) {
             e.preventDefault();
             var id = $(this).data('id');
             if (id == '')
@@ -141,7 +112,7 @@
                 return;
             }
             show_form_modal({
-                url         : "{{ route('admin.manage_fees.form_modal') }}",
+                url         : "{{ route('admin.manage_discounts.form_modal') }}",
                 reqData     : {
                                 _token  : '{{ csrf_token() }}',
                                 id      : id
@@ -172,7 +143,7 @@
                 fetch_data : {
                     func    : fetch_data,
                     params  : {
-                        url         : "{{ route('admin.manage_fees.list') }}",
+                        url         : "{{ route('admin.manage_discounts.list') }}",
                         formData    : formData,
                         target      : $('.js-content_holder')
                     }
@@ -183,26 +154,36 @@
         
         
 
-        $('body').on('submit', '#form_student', function (e) {
+        $('body').on('submit', '#form_discount', function (e) {
             e.preventDefault();
             
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
             
             save_data({
-                url : "{{ route('admin.manage_fees.save_data') }}",
+                url : "{{ route('admin.manage_discounts.save_data') }}",
                 form : $(this),
                 fetch_data : {
                     func    : fetch_data,
                     params  : {
-                        url         : "{{ route('admin.manage_fees.list') }}",
+                        url         : "{{ route('admin.manage_discounts.list') }}",
                         formData    : formData,
                         target      : $('.js-content_holder')
                     }
                 }
             });
         });
-
+        
+        $('body').on('click', '.js-btn_search', function (e) {
+            e.preventDefault();
+            var formData = new FormData($('#search')[0]);
+            formData.append('page', 1);
+            fetch_data({
+                url         : "{{ route('admin.manage_discounts.list') }}",
+                formData    : formData,
+                target      : $('.js-content_holder')
+            });
+        });
 
         $('body').on('submit', '#search', function (e) {
             e.preventDefault();
@@ -211,7 +192,7 @@
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
             fetch_data({
-                url         : "{{ route('admin.manage_fees.list') }}",
+                url         : "{{ route('admin.manage_discounts.list') }}",
                 formData    : formData,
                 target      : $('.js-content_holder')
             });
@@ -223,7 +204,7 @@
             var formData = new FormData($('#search')[0]);
             formData.append('page', page);
             fetch_data({
-                url         : "{{ route('admin.manage_fees.list') }}",
+                url         : "{{ route('admin.manage_discounts.list') }}",
                 formData    : formData,
                 target      : $('.js-content_holder')
             });

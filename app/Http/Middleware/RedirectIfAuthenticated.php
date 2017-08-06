@@ -18,9 +18,21 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+            if(Auth::user()->role == 1)
+            {
+                return redirect()->route('admin.manage_student.index');
+            }
+            else if(Auth::user()->role == 2)
+            {
+                return redirect()->route('cashier.student_payment.index');
+            }
+            else if(Auth::user()->role == 3)
+            {
+                return redirect()->route('reports.receivedpayments.index');
+            }
         }
 
+        // return redirect()->route('login');
         return $next($request);
     }
 }
