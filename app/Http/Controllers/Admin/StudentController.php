@@ -8,12 +8,14 @@ use App\Http\Controllers\Controller;
 use Validator;
 use Carbon;
 use DB;
+use Auth;
 
 use App\Student;
 use App\Grade;
 use App\Section;
 use App\StudentTuitionFee;
-
+use App\Discount;
+use App\StudentDiscount;
 
 class StudentController extends Controller
 {
@@ -24,6 +26,7 @@ class StudentController extends Controller
                             ->paginate(10);
         $Grade = Grade::all();
         $Section = Section::where('grade_id', 1)->get();
+
         return view('admin.manage_student.index', ['Students' => $Students, 'Grade' => $Grade, 'Section' => $Section]);
     }
 
@@ -70,12 +73,13 @@ class StudentController extends Controller
         }
         $Grade = Grade::all();
         $Section = Section::where('grade_id', 1)->get();
-        
-        return view('admin.manage_student.partials.form_modal', ['Student' => $Student, 'Grade' => $Grade, 'Section' => $Section])->render();
+        $Discount = Discount::where('status', 1)->get();
+        return view('admin.manage_student.partials.form_modal', ['Student' => $Student, 'Grade' => $Grade, 'Section' => $Section, 'Discount' => $Discount])->render();
     }
 
     public function save_data (Request $request)
     {
+
          $rules      = [
                 'first_name'        => 'required',
                 'middle_name'       => 'required',
@@ -154,7 +158,7 @@ class StudentController extends Controller
         $Student->grade_id          = $request->grade;
         $Student->section_id        = $request->section;
         $Student->save();
-
+        
         $TuitionFee = \App\TuitionFee::where('grade_id', $request->grade)
                                         ->where('status', 1)
                                         ->first();
@@ -173,12 +177,28 @@ class StudentController extends Controller
             DB::rollBack();
             return response()->json(['code' => 2, 'general_message' => 'No available tuition fee for selected grade.', 'messages' => []]);
         }
+        
+        $discount_sum = 0;
+        foreach ($request->discounts as $key => $data)
+        {
+            $Discount        = Discount::where('id', $key)->first();
+            $discount_sum   += $Discount->discount_amount;
 
+            $StudentDiscount                = new StudentDiscount();
+            $StudentDiscount->student_id    = $Student->id;
+            $StudentDiscount->discount_id   = $Discount->discount_amount;
+            $StudentDiscount->created_by    = Auth::user()->id;
+            $StudentDiscount->school_year   = '';
+            $StudentDiscount->save();
+        }
+
+        
         $StudentTuitionFee = new StudentTuitionFee();
         $StudentTuitionFee->student_id  = $Student->id;
         $StudentTuitionFee->school_year = $this->formulate_sy();
         $StudentTuitionFee->total_remaining = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
         $StudentTuitionFee->additional_fee  = $add_fee;
+        $StudentTuitionFee->total_discount  = $discount_sum;
         $StudentTuitionFee->save();
 
         DB::commit();

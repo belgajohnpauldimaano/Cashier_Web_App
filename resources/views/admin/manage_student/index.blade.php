@@ -51,9 +51,7 @@
                                 <label for="">Show Entries</label>
                                 <select name="show_count" id="show_count" class="form-control js-search_filters">
                                     <option value="">All</option>
-                                    <option value="1" selected="selected">1</option>
-                                    <option value="2">2</option>
-                                    <option value="10">10</option>
+                                    <option value="10" selected="selected">10</option>
                                     <option value="20">20</option>
                                     <option value="30">30</option>
                                     <option value="50">50</option>

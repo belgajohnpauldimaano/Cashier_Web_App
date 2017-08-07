@@ -55,6 +55,13 @@
                         </select>
                         <div class="help-block text-center" id="section-error"></div>
                     </div>
+
+                    @foreach ($Discount as $data)
+                        <div class="checkbox">
+                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>
+                            {{--  <input type="text" name="discounts_id[]" value="{{ $data->id }}">  --}}
+                        </div>
+                    @endforeach
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">Cancel</button>

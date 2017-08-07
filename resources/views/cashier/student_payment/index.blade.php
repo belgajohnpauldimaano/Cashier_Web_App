@@ -52,9 +52,7 @@
                                 <label for="">Show Entries</label>
                                 <select name="show_count" id="show_count" class="form-control js-search_filters">
                                     <option value="">All</option>
-                                    <option value="1" selected="selected">1</option>
-                                    <option value="2">2</option>
-                                    <option value="10">10</option>
+                                    <option value="10" selected>10</option>
                                     <option value="20">20</option>
                                     <option value="30">30</option>
                                     <option value="50">50</option>
@@ -113,7 +111,7 @@
                                 </td>
                                 <td>
                                     @if ($student->tuition->count())
-                                        @if ($student->tuition[0]->total_remaining > 0)
+                                        @if ($student->tuition[0]->additional_fee > 0)
                                             <strong class="text-red">&#8369; {{ a_number_format($student->tuition[0]->additional_fee) }}</strong>
                                         @endif
                                     @endif
@@ -125,11 +123,11 @@
                                             <button class="btn btn-flat btn-default btn-sm js-pay_tuition" data-id="{{ $student->id }}">
                                                 Pay Tuition
                                             </button>
-                                        @else
-                                            <strong class="text-green"><i class="fa fa-check"></i> Paid</strong>
+                                        {{--  @else
+                                            <strong class="text-green"><i class="fa fa-check"></i> Tuition Paid</strong>  --}}
                                         @endif
                                         
-                                         @if ($student->tuition[0]->total_remaining > 0) 
+                                         @if ($student->tuition[0]->additional_fee > 0) 
                                             <button class="btn btn-flat btn-default btn-sm js-pay_addtional" data-id="{{ $student->id }}">
                                                 Pay Other Fees
                                             </button>
@@ -260,7 +258,7 @@
             var formData = new FormData($('#search')[0]);
             formData.append('page', page);
             fetch_data({
-                url         : "{{ route('admin.manage_student.list') }}",
+                url         : "{{ route('cashier.student_payment.fetch_data') }}",
                 formData    : formData,
                 target      : $('.js-content_holder')
             });

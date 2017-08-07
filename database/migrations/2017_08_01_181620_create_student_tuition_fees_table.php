@@ -31,6 +31,7 @@ class CreateStudentTuitionFeesTable extends Migration
             $table->decimal('monthly_payment', 12, 2)->default('0.00');
             $table->decimal('total_remaining', 12, 2)->default('0.00');
             $table->decimal('additional_fee', 12, 2)->default('0.00');
+            $table->decimal('total_discount', 12, 2)->default('0.00');
             $table->tinyInteger('fully_paid')->default('0');
             $table->string('school_year', 20);
             $table->tinyInteger('status')->default('1');

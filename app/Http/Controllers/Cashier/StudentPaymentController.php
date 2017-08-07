@@ -242,6 +242,171 @@ class StudentPaymentController extends Controller
         {
             $monthly_amount = $StudentTuitionFee->total_remaining / 10;
             $StudentTuitionFee->monthly_payment = $monthly_amount;
+            
+            $total_discount = $StudentTuitionFee->total_discount;
+
+            // discount - 10th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_10_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_10_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+
+            // discount - 9th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_9_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_9_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            
+            // discount - 8th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_8_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_8_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 7th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_7_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_7_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 6th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_6_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_6_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 5th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_5_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_5_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 4th month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_4_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_4_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 3rd month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_3_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_3_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 2nd month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_2nd_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_2nd_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
+            // discount - 1st month
+            if ($total_discount > 0)
+            {
+                if ($total_discount > $monthly_amount)
+                {
+                    $StudentTuitionFee->month_1_payment = $monthly_amount;
+                    $total_discount -= $monthly_amount;
+                    $StudentTuitionFee->total_remaining -= $monthly_amount;
+                }
+                else
+                {
+                    $StudentTuitionFee->month_1_payment = $total_discount;
+                    $total_discount = 0;
+                    $StudentTuitionFee->total_remaining -= $total_discount;
+                }
+            }
         }
         else
         {
