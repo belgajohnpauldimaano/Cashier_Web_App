@@ -17,6 +17,7 @@ class CreateStudentTuitionFeesTable extends Migration
             $table->increments('id');
             $table->integer('student_id')->unsigned();
             $table->decimal('down_payment', 12, 2)->default('0.00');
+            $table->decimal('monthly_payment', 12, 2)->default('0.00');
             $table->decimal('month_1_payment', 12, 2)->default('0.00');
             $table->decimal('month_2_payment', 12, 2)->default('0.00');
             $table->decimal('month_3_payment', 12, 2)->default('0.00');
@@ -28,9 +29,10 @@ class CreateStudentTuitionFeesTable extends Migration
             $table->decimal('month_9_payment', 12, 2)->default('0.00');
             $table->decimal('month_10_payment', 12, 2)->default('0.00');
             $table->decimal('total_payment', 12, 2)->default('0.00');
-            $table->decimal('monthly_payment', 12, 2)->default('0.00');
             $table->decimal('total_remaining', 12, 2)->default('0.00');
-            $table->decimal('additional_fee', 12, 2)->default('0.00');
+            $table->decimal('total_tuition', 12, 2)->default('0.00');
+            $table->decimal('additional_fee_remaining', 12, 2)->default('0.00');
+            $table->decimal('additional_fee_total', 12, 2)->default('0.00');
             $table->decimal('total_discount', 12, 2)->default('0.00');
             $table->tinyInteger('fully_paid')->default('0');
             $table->string('school_year', 20);

@@ -163,14 +163,14 @@ class StudentController extends Controller
                                         ->where('status', 1)
                                         ->first();
         
-        $AdditionalFee = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee')
+        $AdditionalFee = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee_total')
                                                 ->where('grade_id', $request->grade)
                                                 ->where('status', 1)
                                                 ->first();
         $add_fee = 0;
         if ($AdditionalFee)
         {
-            $add_fee += $AdditionalFee->additional_fee;
+            $add_fee += $AdditionalFee->additional_fee_total;
         }
         if (!$TuitionFee)
         {
@@ -196,8 +196,10 @@ class StudentController extends Controller
         $StudentTuitionFee = new StudentTuitionFee();
         $StudentTuitionFee->student_id  = $Student->id;
         $StudentTuitionFee->school_year = $this->formulate_sy();
+        $StudentTuitionFee->total_tuition = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
         $StudentTuitionFee->total_remaining = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
-        $StudentTuitionFee->additional_fee  = $add_fee;
+        $StudentTuitionFee->additional_fee_remaining   = $add_fee;
+        $StudentTuitionFee->additional_fee_total  = $add_fee;
         $StudentTuitionFee->total_discount  = $discount_sum;
         $StudentTuitionFee->save();
 
@@ -232,11 +234,11 @@ class StudentController extends Controller
 
     public function test_data ()
     {
-        $AdditionalFees = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee')
+        $AdditionalFees = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee_total')
                                                 ->where('grade_id', 1)
                                                 ->where('status', 1)
                                                 ->first();
-        echo $AdditionalFees->additional_fee;
+        echo $AdditionalFees->additional_fee_total;
         return json_encode($AdditionalFees);
     }
 }

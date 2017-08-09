@@ -150,6 +150,61 @@ class StudentPaymentController extends Controller
         
         $StudentTuitionFee = StudentTuitionFee::where('student_id', $request->id)->first();
 
+        $tuition_amount_updated = $Student->grade->tuition_fee[0]->tuition_fee + $Student->grade->tuition_fee[0]->misc_fee;
+        echo $tuition_amount_updated.  ' ' .  $StudentTuitionFee->total_tuition;
+        if ($tuition_amount_updated != $StudentTuitionFee->total_tuition) // there is a changes on grade level tuition
+        {
+            echo "passed 1";
+            if ($StudentTuitionFee->total_payment > 0)
+            {
+
+                $new_dp = $Student->grade->tuition_fee[0]->misc_fee + 2000;
+                $new_tuition = $tuition_amount_updated;
+                $new_monthly_payment = 0;
+                // $old_total_payment  = $StudentTuitionFee->total_tuition;
+                $old_total_payment      = $StudentTuitionFee->total_payment;
+                $old_dp                 = $StudentTuitionFee->down_payment;
+                $old_total_tuition      = $StudentTuitionFee->total_tuition;
+
+                $dp = 0;
+                if ($new_dp > $old_dp)
+                {
+                    $dp = $old_dp;
+                    $StudentTuitionFee->down_payment = $old_dp;
+                    $old_total_payment -= $old_dp;
+                }
+                else if ($new_dp < $old_dp)
+                {
+                    $dp = $new_dp;
+                    $StudentTuitionFee->down_payment = $new_dp;
+                    $old_total_payment -= $new_dp;
+                }
+
+                $new_remaining_tuition_payment -= $new_tuition - $dp;
+                $new_monthly_payment = $new_remaining_tuition_payment  / 10;
+
+                if ($new_remaining_tuition_payment >= $new_monthly_payment) // check if there is a remaining if we deduct the remaining to monthly payment
+                {
+                    $StudentTuitionFee->month_1_payment = $new_monthly_payment;
+                    $new_remaining_tuition_payment -= $new_monthly_payment;
+                }
+                else if ($new_remaining_tuition_payment != 0)
+                {
+                    $StudentTuitionFee->month_1_payment = $new_remaining_tuition_payment;
+                    $new_remaining_tuition_payment -= $new_monthly_payment;
+                }
+            
+            }
+            else // no payment was added yet
+            {
+                echo "fsdfa";
+            }
+
+
+        }
+        // echo "no changes";
+        return;
+
         $monthly_amount = 0;
         if ($StudentTuitionFee->monthly_payment == 0)
         {
