@@ -79,6 +79,7 @@ class StudentController extends Controller
 
     public function save_data (Request $request)
     {
+        // return json_encode($request->all());
 
          $rules      = [
                 'first_name'        => 'required',
@@ -163,6 +164,8 @@ class StudentController extends Controller
                                         ->where('status', 1)
                                         ->first();
         
+        $tuition_fee = $TuitionFee->tuition_fee;
+
         $AdditionalFee = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee')
                                                 ->where('grade_id', $request->grade)
                                                 ->where('status', 1)
@@ -182,11 +185,12 @@ class StudentController extends Controller
         foreach ($request->discounts as $key => $data)
         {
             $Discount        = Discount::where('id', $key)->first();
-            $discount_sum   += $Discount->discount_amount;
-
+            $discount_value  = $tuition_fee * ($request->discount_rate[$key-1] / 100);
+            $discount_sum   += $discount_value;
+            // echo  $tuition_fee . ' ' . ($request->discount_rate[$key-1] / 100) . ' ' . $discount_sum  . '<br />' ;
             $StudentDiscount                = new StudentDiscount();
             $StudentDiscount->student_id    = $Student->id;
-            $StudentDiscount->discount_id   = $Discount->discount_amount;
+            $StudentDiscount->discount_id   = $Discount->id;
             $StudentDiscount->created_by    = Auth::user()->id;
             $StudentDiscount->school_year   = '';
             $StudentDiscount->save();
@@ -202,7 +206,8 @@ class StudentController extends Controller
         $StudentTuitionFee->save();
 
         DB::commit();
-        return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
+
+        return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => [], 'StudentTuitionFee' => $StudentTuitionFee]);
     }
 
     public function delete (Request $request)

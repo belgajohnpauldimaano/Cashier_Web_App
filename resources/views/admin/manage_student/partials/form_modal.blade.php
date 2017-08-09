@@ -56,12 +56,22 @@
                         <div class="help-block text-center" id="section-error"></div>
                     </div>
 
-                    @foreach ($Discount as $data)
-                        <div class="checkbox">
-                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>
-                            {{--  <input type="text" name="discounts_id[]" value="{{ $data->id }}">  --}}
-                        </div>
-                    @endforeach
+                        <table class="table table-striped table-bordered">
+                            <tr><th colspan="2" class="text-center">Discounts</th></tr>
+                            <tr><th>Discount Name</th><td>Discount Percentage</td></tr>
+                            @foreach ($Discount as $data)
+                                <tr>
+                                    <th>
+                                        <div class="checkbox">
+                                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>
+                                        </div>
+                                    </th>
+                                    <td>
+                                        <input type="number" min="1" name="discount_rate[]" class="form-control" required> 
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">Cancel</button>
