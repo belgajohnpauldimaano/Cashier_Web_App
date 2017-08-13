@@ -8,7 +8,7 @@
             </div>
             
             <div class="overlay hidden"><i class="fa fa-refresh fa-spin"></i></div>
-            @if ($additional_amount > 0)
+            @if ($total_additional_fee > 0)
                 <form id="form_student_additional_payment" class=" box-body">
                     <div class="modal-body">
                         {{ csrf_field() }}
@@ -16,7 +16,7 @@
                         <div class="form-group">
                             <label for="">Amount</label>
                             <h3 class="text-red">
-                                &#8369; {{a_number_format($additional_amount)}}
+                                &#8369; {{a_number_format($total_additional_fee)}}
                             </h3>
                         </div>
                         <div class="form-group">
@@ -31,9 +31,15 @@
                     </div>
                 </form>
             @else
-                <div class="modal-body">
-                    <h3 class="text-center text-red">Already paid.</h3>
-                </div>
+                @if ($student_tuition->count() > 0)
+                    <div class="modal-body">
+                        <h3 class="text-center text-red">Already paid.</h3>
+                    </div>
+                @else 
+                    <div class="modal-body">
+                        <h3 class="text-center text-red">No additional payment to be paid.</h3>
+                    </div>
+                @endif
             @endif
         </div>
     </div>

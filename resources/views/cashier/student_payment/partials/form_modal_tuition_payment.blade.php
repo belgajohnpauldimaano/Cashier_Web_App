@@ -11,13 +11,13 @@
             <form id="form_student_payment" class=" box-body">
                 <div class="modal-body">
                     {{ csrf_field() }}
-                     @if($Student) 
-                         <input type="hidden" name="id" value="{{ $Student->id }}"> 
+                     @if($student_id) 
+                         <input type="hidden" name="id" value="{{ $student_id }}"> 
                      @endif 
                     <div class="form-group">
                         <label for="">Amount</label>
                         <h3 class="text-red">
-                            &#8369; {{a_number_format($tuition_amount)}}
+                            &#8369; {{a_number_format($monthly)}}
                         </h3>
                     </div>
                     <div class="form-group">
@@ -27,9 +27,9 @@
                     </div>
                     
                     <div class="form-group text-right">
-                        <label for="">Total Remaining Tuition</label>
+                        <label for="">Outstanding Balance</label>
                         <h3 class="text-red">
-                            &#8369; {{ a_number_format($remaining_tuition) }}
+                            &#8369; {{ a_number_format($outstanding_balance) }}
                         </h3>
                     </div>
                 </div>

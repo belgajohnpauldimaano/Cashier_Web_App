@@ -16,7 +16,7 @@ use App\Section;
 use App\StudentTuitionFee;
 use App\Discount;
 use App\StudentDiscount;
-
+use App\StudentDiscountList;
 class StudentController extends Controller
 {
     public function index ()
@@ -68,7 +68,7 @@ class StudentController extends Controller
         $Student = NULL;
         if ($request->id)
         {
-            $Student = Student::with(['grade', 'section'])->where('id', $request->id)->first();
+            $Student = Student::with(['grade', 'section', 'discount_list'])->where('id', $request->id)->first();
             // return json_encode($Student);
         }
         $Grade = Grade::all();
@@ -145,66 +145,106 @@ class StudentController extends Controller
             $Student->grade_id          = $request->grade;
             $Student->section_id        = $request->section;
             $Student->save();
+            
+            $StudentDiscountList = StudentDiscountList::where('student_id', $request->id)->first();
+            $StudentDiscountList->scholar = ($request->scholar              ? $request->scholar             / 100   : '0.00');
+            $StudentDiscountList->school_subsidy = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
+            $StudentDiscountList->employee_scholar = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
+            $StudentDiscountList->gov_subsidy = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
+            $StudentDiscountList->acad_scholar = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
+            $StudentDiscountList->family_member = ($request->family_member        ? $request->family_member       / 100   : '0.00');
+            $StudentDiscountList->nbi_alumni = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
+            $StudentDiscountList->cash_discount = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
+            $StudentDiscountList->cwoir_discount = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
+            $StudentDiscountList->st_joseph_discount = ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
+            $StudentDiscountList->student_id = $Student->id;
+            $StudentDiscountList->save();
 
             return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
         }
 
-        DB::beginTransaction();
-        $Student = new Student();
-        $Student->student_number    = '';
-        $Student->first_name        = $request->first_name;
-        $Student->middle_name       = $request->middle_name;
-        $Student->last_name         = $request->last_name;
-        $Student->grade_id          = $request->grade;
-        $Student->section_id        = $request->section;
-        $Student->save();
-        
-        $TuitionFee = \App\TuitionFee::where('grade_id', $request->grade)
-                                        ->where('status', 1)
-                                        ->first();
-        
-        $AdditionalFee = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee_total')
-                                                ->where('grade_id', $request->grade)
-                                                ->where('status', 1)
-                                                ->first();
-        $add_fee = 0;
-        if ($AdditionalFee)
+        try 
         {
-            $add_fee += $AdditionalFee->additional_fee_total;
+            DB::beginTransaction();
+            $Student = new Student();
+            $Student->student_number    = '';
+            $Student->first_name        = $request->first_name;
+            $Student->middle_name       = $request->middle_name;
+            $Student->last_name         = $request->last_name;
+            $Student->grade_id          = $request->grade;
+            $Student->section_id        = $request->section;
+            $Student->save();
+
+            
+        
+            $StudentDiscountList = new StudentDiscountList();
+            $StudentDiscountList->scholar = ($request->scholar              ? $request->scholar             / 100   : '0.00');
+            $StudentDiscountList->school_subsidy = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
+            $StudentDiscountList->employee_scholar = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
+            $StudentDiscountList->gov_subsidy = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
+            $StudentDiscountList->acad_scholar = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
+            $StudentDiscountList->family_member = ($request->family_member        ? $request->family_member       / 100   : '0.00');
+            $StudentDiscountList->nbi_alumni = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
+            $StudentDiscountList->cash_discount = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
+            $StudentDiscountList->cwoir_discount = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
+            $StudentDiscountList->st_joseph_discount = ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
+            $StudentDiscountList->student_id = $Student->id;
+            $StudentDiscountList->save();
+
+            
+            $StudentTuitionFee = new StudentTuitionFee();
+            $StudentTuitionFee->student_id  = $Student->id;
+            $StudentTuitionFee->school_year = $this->formulate_sy();
+            //$StudentTuitionFee->total_tuition = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
+            //$StudentTuitionFee->total_remaining = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
+            //$StudentTuitionFee->additional_fee_remaining   = $add_fee;
+            // $StudentTuitionFee->additional_fee_total  = $add_fee;
+            //$StudentTuitionFee->total_discount  = $discount_sum;
+            $StudentTuitionFee->save();
+
+            DB::commit();
+            return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
         }
-        if (!$TuitionFee)
+        catch (Exception $e)
         {
             DB::rollBack();
-            return response()->json(['code' => 2, 'general_message' => 'No available tuition fee for selected grade.', 'messages' => []]);
-        }
-        
-        $discount_sum = 0;
-        foreach ($request->discounts as $key => $data)
-        {
-            $Discount        = Discount::where('id', $key)->first();
-            $discount_sum   += $Discount->discount_amount;
-
-            $StudentDiscount                = new StudentDiscount();
-            $StudentDiscount->student_id    = $Student->id;
-            $StudentDiscount->discount_id   = $Discount->discount_amount;
-            $StudentDiscount->created_by    = Auth::user()->id;
-            $StudentDiscount->school_year   = '';
-            $StudentDiscount->save();
+            return response()->json(['code' => 1, 'general_message' => 'Error in saving student information.', 'messages' => []]);
         }
 
+        // $TuitionFee = \App\TuitionFee::where('grade_id', $request->grade)
+        //                                 ->where('status', 1)
+        //                                 ->first();
         
-        $StudentTuitionFee = new StudentTuitionFee();
-        $StudentTuitionFee->student_id  = $Student->id;
-        $StudentTuitionFee->school_year = $this->formulate_sy();
-        $StudentTuitionFee->total_tuition = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
-        $StudentTuitionFee->total_remaining = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
-        $StudentTuitionFee->additional_fee_remaining   = $add_fee;
-        $StudentTuitionFee->additional_fee_total  = $add_fee;
-        $StudentTuitionFee->total_discount  = $discount_sum;
-        $StudentTuitionFee->save();
+        // $AdditionalFee = \App\AdditionalFee::selectRaw('sum(additional_amount) as additional_fee_total')
+        //                                         ->where('grade_id', $request->grade)
+        //                                         ->where('status', 1)
+        //                                         ->first();
+        // $add_fee = 0;
+        // if ($AdditionalFee)
+        // {
+        //     $add_fee += $AdditionalFee->additional_fee_total;
+        // }
+        // if (!$TuitionFee)
+        // {
+        //     DB::rollBack();
+        //     return response()->json(['code' => 2, 'general_message' => 'No available tuition fee for selected grade.', 'messages' => []]);
+        // }
+        
+        // $discount_sum = 0;
+        // foreach ($request->discounts as $key => $data)
+        // {
+        //     $Discount        = Discount::where('id', $key)->first();
+        //     $discount_sum   += $Discount->discount_amount;
 
-        DB::commit();
-        return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
+        //     $StudentDiscount                = new StudentDiscount();
+        //     $StudentDiscount->student_id    = $Student->id;
+        //     $StudentDiscount->discount_id   = $Discount->discount_amount;
+        //     $StudentDiscount->created_by    = Auth::user()->id;
+        //     $StudentDiscount->school_year   = '';
+        //     $StudentDiscount->save();
+        // }
+
+        
     }
 
     public function delete (Request $request)

@@ -1,7 +1,7 @@
 <!doctype>
 <html>
     <head>
-        <title>Student Summary Balance</title>
+        <title>Summary Per year Level</title>
            {{--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">     --}}
 
         <style>
@@ -55,7 +55,7 @@
     </head>
     <body>
         <div class="container">
-            <h2 class="text-center">Student Balance Summary Report</h2>
+            <h2 class="text-center">Summary Per year Level</h2>
             {{--  <div class="text-right">Total Tuition Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_tuition_balance) }}</strong></div>
             <div class="text-right">Total Other Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_additional_fee) }}</strong></div>
             <div class="text-right">Total Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_additional_fee + $StudentTuitionFee->total_tuition_balance)}}</strong></div>  --}}
@@ -72,17 +72,18 @@
             ?>
             <table class="table table-bordered">
                 <tr>
-                    <th>Name</th>
-                    <th>Grade</th>
-                    <th>Section</th>
-                    <th>Tuition</th>
-                    <th>Discount</th>
-                    <th>Net Tuition</th>
-                    <th>Tuition Paid Fees</th>
-                    <th>Additional Fees</th>
-                    <th>Additional Paid Fees</th>
-                    <th>Outstanding Balance</th>
+                    <th>Grade Level</th>
+                    <th> Section</th>
+                    <th>No. of Student</th>
+                    <th>Total Tuition</th>
                 </tr>
+                <?php
+                    $total_tuition_payment = 0;
+                    $total_additional_payment = 0;
+                    $total_tuition = 0;
+                    $total_additional = 0;
+                    $over_all_total = 0;
+                ?>
                 @foreach ($Students as $student)
                     <?php
                         $discount = 0;
@@ -120,69 +121,25 @@
                         $over_all_paid_fee += $paid_fee;
                         $over_all_add_paid_fee += $add_paid_fee;
                         $over_outstanding_balace += $outstanding_balance;
+                        
                     ?>
-                    <tr>
-                        <td>
-                            {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
-                        </td>
-                        <td>
-                            @if ($student->grade)
-                                {{ $student->grade->grade }}
-                            @endif
-                        </td>
-                        <td>
-                            @if ($student->section)
-                                {{ $student->section->section_name }}
-                            @endif
-                        </td>
-                        <td>
-                            @if ($student->grade_tuition)
-                                {{ a_number_format($tuition_fee) }}
-                            @endif
-                        </td>
-                        <td>
-                            @if ($student->discount_list)
-                                {{ a_number_format($discount) }}
-                            @endif
-                        </td>
-                        <td>
-                            @if ($student->discount_list)
-                                {{ a_number_format($net_tuition) }}
-                            @endif
-                        </td>
-                        <td>
-                            @if ($student->tuition)
-                                {{ a_number_format( $paid_fee) }}
-                            @endif
-                        </td>
-                        <td>
-                            @if ($student->additional_fee)
-                                @foreach($student->additional_fee as $additional)
-                                    <?php  
-                                        $additional_fee_total += $additional->additional_amount; 
-                                    ?>
-                                @endforeach
-                                <?php $over_all_add_fee += $additional_fee_total; ?>
-                                {{ a_number_format($additional_fee_total - $additiona_fee_total_payment) }}
-                            @endif
-                        </td>
-                        <td>
-                                {{ a_number_format($add_paid_fee ) }}
-                        </td>
-                        <td class="text-danger">
-                                {{ a_number_format($outstanding_balance ) }}
-                        </td>
-                    </tr>
+                    
                 @endforeach
                     <tr class="text-danger">
-                        <td colspan="3">Total</td>
+                        <td>
+                            {{ $grade_selected }}
+                        </td>
+                        <td>
+                            {{$section_selected}} 
+                        </td>
+                        <td>{{ $Students->count() }}</td>
                         <td>{{ a_number_format($over_all_tuition_sum) }}</td>
-                        <td>{{ a_number_format($over_all_discount_sum) }}</td>
+                        {{--  <td>{{ a_number_format($over_all_discount_sum) }}</td>
                         <td>{{ a_number_format($over_all_net_tuition) }}</td>
                         <td>{{ a_number_format($over_all_paid_fee) }}</td>
                         <td>{{ a_number_format($over_all_add_fee) }}</td>
                         <td>{{ a_number_format($over_all_add_paid_fee) }}</td>
-                        <td>{{ a_number_format($over_outstanding_balace) }}</td>
+                        <td>{{ a_number_format($over_outstanding_balace) }}</td>  --}}
                     </tr>
             </table>
         </div>

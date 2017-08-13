@@ -56,12 +56,109 @@
                         <div class="help-block text-center" id="section-error"></div>
                     </div>
 
-                    @foreach ($Discount as $data)
+                    {{--  @foreach ($Discount as $data)
                         <div class="checkbox">
-                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>
+                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>  --}}
                             {{--  <input type="text" name="discounts_id[]" value="{{ $data->id }}">  --}}
-                        </div>
-                    @endforeach
+                        {{--  </div>
+                    @endforeach  --}}
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center" colspan="2">Discounts</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Scholar</td>
+                                <td>
+                                    <select name="scholar" id="scholar" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="100" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->scholar * 100 == 100 ? 'selected' : '') : '') : '') }}>100%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>School Subsidy</td>
+                                <td>
+                                    <input type="number" name="school_subsidy" id="school_subsidy" class="form-control" value="{{ ( $Student ? ($Student->discount_list ? $Student->discount_list->school_subsidy  : '') : '') }}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Employee Scholar</td>
+                                <td>
+                                    <select name="employee_scholar" id="employee_scholar" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="100" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->employee_scholar * 100 == 100 ? 'selected' : '') : '') : '') }}>100%</option>
+                                        <option value="50" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->employee_scholar * 100 == 50 ? 'selected' : '') : '') : '') }}>50%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td title="Gov't Subsidy - SV & PEAC-FAPE">Gov't Subsidy</td>
+                                <td>
+                                    <input type="number" name="gov_subsidy" id="gov_subsidy" class="form-control" value="{{ ( $Student ? ($Student->discount_list ? $Student->discount_list->gov_subsidy  : '') : '') }}" />
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Academic Scholarship</td>
+                                <td>
+                                    <select name="acad_scholar" id="acad_scholar" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="100" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->acad_scholar * 100 == 100 ? 'selected' : '') : '') : '') }}>100%</option>
+                                        <option value="50" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->acad_scholar * 100 == 50 ? 'selected' : '') : '') : '') }}>50%</option>
+                                        <option value="20" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->acad_scholar * 100 == 20 ? 'selected' : '') : '') : '') }}>20%</option>
+                                        <option value="10" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->acad_scholar * 100 == 10 ? 'selected' : '') : '') : '') }}>10%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Family Member</td>
+                                <td>
+                                    <select name="family_member" id="family_member" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="100" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->family_member * 100 == 100 ? 'selected' : '') : '') : '') }}>100%</option>
+                                        <option value="50" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->family_member * 100 == 50 ? 'selected' : '') : '') : '') }}>50%</option>
+                                        <option value="10" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->family_member * 100 == 10 ? 'selected' : '') : '') : '') }}>10%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>NBI Alumni</td>
+                                <td>
+                                    <select name="nbi_alumni" id="nbi_alumni" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="10" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->nbi_alumni * 100 == 10 ? 'selected' : '') : '') : '') }}>10%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cash Discount</td>
+                                <td>
+                                    <select name="cash_discount" id="cash_discount" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="10" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->cash_discount * 100 == 10 ? 'selected' : '') : '') : '') }}>10%</option>
+                                        <option value="5" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->cash_discount * 100 == 5 ? 'selected' : '') : '') : '') }}>5% - Semi Annually</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Cwoir Discount</td>
+                                <td>
+                                    <select name="cwoir_discount" id="cwoir_discount" class="form-control">
+                                        <option value="">No Discount</option>
+                                        <option value="10" {{ ( $Student ? ($Student->discount_list ? ($Student->discount_list->cwoir_discount * 100 == 10 ? 'selected' : '') : '') : '') }}>10%</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>St. Joseph Discount</td>
+                                <td>
+                                    <input type="number" name="st_jospeh_discount" id="st_jospeh_discount" class="form-control" value="{{ ( $Student ? ($Student->discount_list ? $Student->discount_list->st_joseph_discount  : '') : '') }}" />
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">Cancel</button>

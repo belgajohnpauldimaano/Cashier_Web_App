@@ -27,4 +27,19 @@ class Student extends Model
     {
         return $this->hasMany(StudentDiscount::class, 'student_id', 'id');
     }
+
+    public function discount_list ()
+    {
+        return $this->hasOne(StudentDiscountList::class, 'student_id', 'id');
+    }
+    
+    public function grade_tuition ()
+    {
+        return $this->hasMany(TuitionFee::class, 'grade_id', 'grade_id');
+    }
+
+    public function additional_fee ()
+    {
+        return $this->hasMany(AdditionalFee::class, 'grade_id', 'grade_id');
+    }
 }
