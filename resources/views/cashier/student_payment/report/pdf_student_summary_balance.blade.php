@@ -59,6 +59,7 @@
             {{--  <div class="text-right">Total Tuition Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_tuition_balance) }}</strong></div>
             <div class="text-right">Total Other Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_additional_fee) }}</strong></div>
             <div class="text-right">Total Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_additional_fee + $StudentTuitionFee->total_tuition_balance)}}</strong></div>  --}}
+            <div class="text-right">Date Generated : {{ date('F d, Y') }}</div>
             <br>
             <?php
                 $over_all_tuition_sum = 0;
@@ -79,9 +80,9 @@
                     <th>Discount</th>
                     <th>Net Tuition</th>
                     <th>Tuition Paid Fees</th>
+                    <th>Outstanding Balance</th>
                     <th>Additional Fees</th>
                     <th>Additional Paid Fees</th>
-                    <th>Outstanding Balance</th>
                 </tr>
                 @foreach ($Students as $student)
                     <?php
@@ -108,7 +109,7 @@
                         
                         $additiona_fee_total_payment = $student->tuition[0]->additional_fee_total;
                         
-                        $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment - $student->tuition[0]->down_payment;
+                        $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
                         if ($outstanding_balance <= 0)
                         {
                             $outstanding_balance = 0;
@@ -155,6 +156,9 @@
                                 {{ a_number_format( $paid_fee) }}
                             @endif
                         </td>
+                        <td class="text-danger">
+                                {{ a_number_format($outstanding_balance ) }}
+                        </td>
                         <td>
                             @if ($student->additional_fee)
                                 @foreach($student->additional_fee as $additional)
@@ -169,9 +173,6 @@
                         <td>
                                 {{ a_number_format($add_paid_fee ) }}
                         </td>
-                        <td class="text-danger">
-                                {{ a_number_format($outstanding_balance ) }}
-                        </td>
                     </tr>
                 @endforeach
                     <tr class="text-danger">
@@ -180,9 +181,9 @@
                         <td>{{ a_number_format($over_all_discount_sum) }}</td>
                         <td>{{ a_number_format($over_all_net_tuition) }}</td>
                         <td>{{ a_number_format($over_all_paid_fee) }}</td>
-                        <td>{{ a_number_format($over_all_add_fee) }}</td>
-                        <td>{{ a_number_format($over_all_add_paid_fee) }}</td>
                         <td>{{ a_number_format($over_outstanding_balace) }}</td>
+                        <td>{{ a_number_format($over_all_add_fee - $over_all_add_paid_fee) }}</td>
+                        <td>{{ a_number_format($over_all_add_paid_fee) }}</td>
                     </tr>
             </table>
         </div>

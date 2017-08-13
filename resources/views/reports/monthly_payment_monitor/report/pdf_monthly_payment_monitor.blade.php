@@ -100,7 +100,7 @@
                             $net_tuition = ($tuition + $student->grade_tuition[0]->misc_fee) - $discount;
                             $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
                             
-                            $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment - $student->tuition[0]->down_payment;
+                            $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
 
                             if ($outstanding_balance <= 0)
                             {

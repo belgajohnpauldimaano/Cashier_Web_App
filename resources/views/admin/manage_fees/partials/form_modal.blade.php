@@ -53,7 +53,7 @@
                             <div class="form-group">
                                 <input type="hidden" name="{{ $input_name }}_id" value="{{ $data->id }}">
                                 <label for="">{{ $data->additional_title }} {{ $input_name }} <span class="text-red">*</span></label>
-                                <input type="number" min="1" class="form-control" name="{{ $input_name }}" id="{{ $input_name }}" value="{{ $data->additional_amount }}">
+                                <input type="number" class="form-control" name="{{ $input_name }}" id="{{ $input_name }}" value="{{ $data->additional_amount }}">
                                 <div class="help-block text-center" id="{{ $input_name }}-error"></div>
                             </div>
                         @endforeach

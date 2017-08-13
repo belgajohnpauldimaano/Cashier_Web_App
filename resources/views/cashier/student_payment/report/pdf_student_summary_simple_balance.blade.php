@@ -59,6 +59,7 @@
             {{--  <div class="text-right">Total Tuition Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_tuition_balance) }}</strong></div>
             <div class="text-right">Total Other Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_additional_fee) }}</strong></div>
             <div class="text-right">Total Balance <strong class="text-danger">{{ a_number_format($StudentTuitionFee->total_additional_fee + $StudentTuitionFee->total_tuition_balance)}}</strong></div>  --}}
+            <div class="text-right">Date Generated : {{ date('F d, Y') }}</div>
             <br>
             <?php
                 $over_all_tuition_sum = 0;
@@ -109,7 +110,7 @@
                         
                         $additiona_fee_total_payment = $student->tuition[0]->additional_fee_total;
                         
-                        $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment - $student->tuition[0]->down_payment;
+                        $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
                         if ($outstanding_balance <= 0)
                         {
                             $outstanding_balance = 0;

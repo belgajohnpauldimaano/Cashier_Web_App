@@ -112,16 +112,16 @@ class ReceivedPaymentsController extends Controller
                                             }
                                         })
                                         ->whereHas('student', function ($query) use ($request){
-                                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->search_filter ."%' ");
+                                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
                                         
-                                            if ($request->filter_grade)
+                                            if ($request->report_filter_grade)
                                             {
-                                                $query->where('grade_id', $request->filter_grade);
+                                                $query->where('grade_id', $request->report_filter_grade);
                                             }
 
-                                            if ($request->filter_section)
+                                            if ($request->report_filter_section)
                                             {
-                                                $query->where('section_id', $request->filter_section);
+                                                $query->where('section_id', $request->report_filter_section);
                                             }
                                         })
                                         ->get();
@@ -139,16 +139,16 @@ class ReceivedPaymentsController extends Controller
                                             }
                                         })
                                         ->whereHas('student', function ($query) use ($request){
-                                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->search_filter ."%' ");
+                                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
                                         
-                                            if ($request->filter_grade)
+                                            if ($request->report_filter_grade)
                                             {
-                                                $query->where('grade_id', $request->filter_grade);
+                                                $query->where('grade_id', $request->report_filter_grade);
                                             }
 
-                                            if ($request->filter_section)
+                                            if ($request->report_filter_section)
                                             {
-                                                $query->where('section_id', $request->filter_section);
+                                                $query->where('section_id', $request->report_filter_section);
                                             }
                                         })
                                         ->selectRaw('SUM(payment) as sum')->first();

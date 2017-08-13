@@ -25,10 +25,10 @@
                         <th>Tuition</th>
                         <th>Discount</th>
                         <th>Net Tuition</th>
-                        <th>Paid Fees</th>
-                        <th>Additional Fees</th>
-                        <th>Additional Paid Fees</th>
+                        <th>Paid Tuition</th>
                         <th>Outstanding Balance</th>
+                        <th>Additional Fees</th> 
+                        <th>Additional Fees Paid</th>   
                         {{--  <th>Remaining Balance</th>  --}}
                         {{--  <th>Additional Fee Balance</th>  --}}
                         <th>Actions</th>
@@ -98,6 +98,9 @@
                                     @endif
                                 </td>
                                 <td>
+                                        {{ a_number_format( $outstanding_balance) }}
+                                </td>
+                                <td>
                                     @if ($student->additional_fee)
                                         @foreach($student->additional_fee as $additional)
                                             <?php  
@@ -109,9 +112,6 @@
                                 </td>
                                 <td>
                                         {{ a_number_format( $student->tuition[0]->additional_fee_total) }}
-                                </td>
-                                <td>
-                                        {{ a_number_format( $outstanding_balance) }}
                                 </td>
                                 <td>
                                     <div class="btn-group">
