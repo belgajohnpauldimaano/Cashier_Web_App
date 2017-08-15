@@ -66,7 +66,7 @@
                     <th>Student Name</th>
                     <th>Grade / Section</th>
                     <th>Down Payment</th>
-                    @if ($request['report_filter_month'] == '' || $request['report_filter_month_to'] == '')
+                    @if ($request['report_filter_month'] == '' && $request['report_filter_month_to'] == '')
                         @foreach($months_array as $mon)
                             <th>{{ $mon }}</th>
                         @endforeach
@@ -137,11 +137,11 @@
                                     <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
                                 @endif
                             </td>
-                            <td> 
+                            <td class="text-right">
                                 <span class="text-red"> {{ a_number_format($student->tuition[0]->down_payment) }}</span>
                             </td>
                             @if ($request['report_filter_month'] == '')
-                                <td>
+                                <td class="text-right">
                                 
                                         @if ($student->tuition[0]->month_1_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_1_payment) }}</span>
@@ -151,7 +151,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_2_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_2_payment) }}</span>
                                         @else
@@ -160,7 +160,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_3_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_3_payment) }}</span>
                                         @else
@@ -169,7 +169,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_4_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_4_payment) }}</span>
                                         @else
@@ -178,7 +178,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_5_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_5_payment) }}</span>
                                         @else
@@ -187,7 +187,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_6_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_6_payment) }}</span>
                                         @else
@@ -196,7 +196,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_7_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_7_payment) }}</span>
                                         @else
@@ -205,7 +205,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_8_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_8_payment) }}</span>
                                         @else
@@ -214,7 +214,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_9_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_9_payment) }}</span>
                                         @else
@@ -223,7 +223,7 @@
                                             </span>
                                         @endif
                                 </td>
-                                <td>
+                                <td class="text-right">
                                         @if ($student->tuition[0]->month_10_payment < $monthly_amount)
                                             <span class="text-red"> {{ a_number_format($student->tuition[0]->month_10_payment) }}</span>
                                         @else
@@ -235,7 +235,7 @@
                             @else
                                 
                                 @for($i=$request['report_filter_month']-1;$i<$request['report_filter_month_to'];$i++)
-                                    <td>
+                                    <td class="text-right">
                                         @if ($student->tuition[0][$month_field[$i]] < $monthly_amount)
                                             <span class="text-red">
                                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
@@ -261,8 +261,8 @@
                                 </td>  --}}
                             @endif
                             
-                            <td>
-                                <span class="text-red"> {{ a_number_format($outstanding_balance) }}</span>
+                            <td class="text-right">
+                                <span class="text-red "> {{ a_number_format($outstanding_balance) }}</span>
                             </td>
                         </tr>
                     @endforeach

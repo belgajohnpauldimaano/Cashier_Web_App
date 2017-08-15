@@ -17,7 +17,7 @@
         <th>Student Name</th>
         <th>Grade / Section</th>
         <th>Down Payment</th>
-        @if ($request['filter_month'] == '' || $request['filter_month_to'] == '')
+        @if ($request['filter_month'] == '' && $request['filter_month_to'] == '')
             @foreach($months_array as $mon)
                 <th>{{ $mon }}</th>
             @endforeach

@@ -142,7 +142,7 @@ class MonthlyPaymentMonitorController extends Controller
         
         if ($request->report_filter_month != '' && $request->report_filter_month_to != '')
         {
-            for($i=$request->report_filter_month - 1;$i<=$request->report_filter_month_to;$i++)
+            for($i=$request->report_filter_month - 1;$i<$request->report_filter_month_to;$i++)
             {
                 $selected_monts .= $month_array[$i];
             }

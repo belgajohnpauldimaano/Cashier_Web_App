@@ -136,30 +136,30 @@
                                 {{ $student->section->section_name }}
                             @endif
                         </td>
-                        <td>
+                        <td class="text-right">
                             @if ($student->grade_tuition)
                                 {{ a_number_format($tuition_fee) }}
                             @endif
                         </td>
-                        <td>
+                        <td class="text-right">
                             @if ($student->discount_list)
                                 {{ a_number_format($discount) }}
                             @endif
                         </td>
-                        <td>
+                        <td class="text-right">
                             @if ($student->discount_list)
                                 {{ a_number_format($net_tuition) }}
                             @endif
                         </td>
-                        <td>
+                        <td class="text-right">
                             @if ($student->tuition)
                                 {{ a_number_format( $paid_fee) }}
                             @endif
                         </td>
-                        <td class="text-danger">
+                        <td class="text-danger text-right">
                                 {{ a_number_format($outstanding_balance ) }}
                         </td>
-                        <td>
+                        <td class="text-right">
                             @if ($student->additional_fee)
                                 @foreach($student->additional_fee as $additional)
                                     <?php  
@@ -170,20 +170,20 @@
                                 {{ a_number_format($additional_fee_total - $additiona_fee_total_payment) }}
                             @endif
                         </td>
-                        <td>
+                        <td class="text-right">
                                 {{ a_number_format($add_paid_fee ) }}
                         </td>
                     </tr>
                 @endforeach
                     <tr class="text-danger">
                         <td colspan="3">Total</td>
-                        <td>{{ a_number_format($over_all_tuition_sum) }}</td>
-                        <td>{{ a_number_format($over_all_discount_sum) }}</td>
-                        <td>{{ a_number_format($over_all_net_tuition) }}</td>
-                        <td>{{ a_number_format($over_all_paid_fee) }}</td>
-                        <td>{{ a_number_format($over_outstanding_balace) }}</td>
-                        <td>{{ a_number_format($over_all_add_fee - $over_all_add_paid_fee) }}</td>
-                        <td>{{ a_number_format($over_all_add_paid_fee) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_tuition_sum) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_discount_sum) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_net_tuition) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_paid_fee) }}</td>
+                        <td class="text-right">{{ a_number_format($over_outstanding_balace) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_add_fee - $over_all_add_paid_fee) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_add_paid_fee) }}</td>
                     </tr>
             </table>
         </div>
