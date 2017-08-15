@@ -18,6 +18,8 @@ class CreateStudentPaymentLogsTable extends Migration
             $table->integer('student_id')->unsigned();
             $table->decimal('payment', 12, 2);
             $table->tinyInteger('payment_type');
+            $table->dateTime('received_date')->nullable();
+            $table->string('or_number', 100)->nullable();
             $table->integer('received_by')->unsigned();
             $table->timestamps();
         });

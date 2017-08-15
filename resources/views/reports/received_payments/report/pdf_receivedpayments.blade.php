@@ -72,8 +72,9 @@
                     <th>Grade / Section</th>
                     <th>Payment Type</th>
                     <th>Payment Amount</th>
-                    <th>Received by</th>
+                    <th>OR Number</th>
                     <th>Date Received</th>
+                    <th>Received by</th>
                 </tr>
                 <tbody>
                     @foreach ($StudentPaymentLog as $data)
@@ -95,14 +96,17 @@
                                 <span class="text-red">P {{ a_number_format($data->payment) }}</span>
                             </td>
                             <td>
+                                <span class="">{{ $data->or_number }}</span>
+                            </td>
+                            <td>
+                                {{ \Carbon\Carbon::parse($data->received_date, 'Asia/Manila')->format('F d, Y') }}
+                            </td>
+                            <td>
                                 @if ($data->user)
                                     <span class="">{{ $data->user->first_name }}</span>
                                 @else
                                     <span>n/a</span>
                                 @endif
-                            </td>
-                            <td>
-                                {{ \Carbon\Carbon::parse($data->created_at, 'Asia/Manila')->format('F d, Y h:i:s A') }}
                             </td>
                         </tr>
                     @endforeach

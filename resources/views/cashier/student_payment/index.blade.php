@@ -2,6 +2,10 @@
 
 @section('content_title', 'Student Payment')
 
+@section('styles')
+  <link rel="stylesheet" href="{{ asset('cms/plugins/datepicker/datepicker3.css') }}">
+@endsection
+
 @section ('content')
     <div class=" pull-right">
         <button class="btn btn-danger btn-flat btn-sm js-student_summary_balance_export_pdf"><i class="fa fa-file-pdf-o"></i> Export pdf</button>
@@ -216,6 +220,8 @@
 @endsection
 
 @section ('scripts')
+
+    <script src="{{ asset('cms/plugins/datepicker/bootstrap-datepicker.js') }}"></script>
     <script>
         $('body').on('click', '.js-pay_tuition', function (e) {
             e.preventDefault();
@@ -370,6 +376,8 @@
             e.preventDefault();
             var formData = new FormData($(this)[0]);
             var fetchFormData = new FormData($('#search')[0]);
+            var formEl = $(this);
+             $(this).parents('.box').children('.overlay').removeClass('hidden');
             $.ajax({
                 url : "{{ route('cashier.student_payment.tuition_payment_process') }}",
                 type : 'POST',
@@ -378,9 +386,21 @@
                 processData : false,
                 contentType : false,
                 success     : function (resData) {
+                    formEl.parents('.box').children('.overlay').addClass('hidden');
+                    $(this).children('.form-group').children('.help-block').children('code').fadeOut('slow', function () {
+                    
+                    });
                     if (resData.code == 1)
                     {
                         show_toast_message({heading : 'Error', icon : 'error', text : resData.general_message, hideAfter : 4000 });
+                        var text = [];
+                        for(var err in resData.messages)
+                        {
+                            $('#' + err +'-error').html('<code style="display:none">'+ resData.messages[err] +'</code>');
+                            $('#' + err +'-error').children('code').fadeIn('slow');
+                            text.push(resData.messages[err]);
+                        }
+                        show_toast_message({heading : 'Error', icon : 'error', text : text, hideAfter : 10000 });
                     }
                     else if (resData.code == 2)
                     {
@@ -399,6 +419,13 @@
                 }
             });
 
+        });
+
+        $('body').on('show.bs.modal', '#form_tuition_fee_payment_modal', function () {
+            $('#date_received').datepicker({
+                Default: new Date(),
+                format: 'yyyy-mm-dd'
+            }).datepicker("setDate", new Date());;
         });
     </script>
 @endsection

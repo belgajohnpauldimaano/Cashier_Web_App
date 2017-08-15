@@ -228,30 +228,34 @@ class StudentPaymentController extends Controller
         $down_payment = $Student->tuition[0]->down_payment;
 
         $net_tuition = $total_tuition - $discount;
+        $net_tuition_no_discount = $total_tuition - $total_tuition_payment;
         $outstanding_balance = $net_tuition - $total_tuition_payment;
 
-        $monthly = 0;
+        $monthly = $misc_fee + 2000;
 
-        if ($down_payment == 0)
+        if ($down_payment < $monthly)
+        // if ($down_payment == 0)
         {
-            $monthly = $misc_fee + 2000;
-            if ($monthly > $net_tuition)
+            $monthly = $monthly - $down_payment;
+            if ($monthly > $net_tuition && $down_payment == 0)
             {
                 $monthly = $net_tuition;
             }
         }
         else
         {
-            $monthly = ($net_tuition - $down_payment) / 10;
+            // $monthly = ($net_tuition - $down_payment) / 10;
+            $monthly = ($total_tuition - $down_payment) / 10;
         }
 
-        
-
-
+        if ($monthly > $outstanding_balance)
+        {
+            $monthly = $outstanding_balance;
+        }
         // echo $monthly.  '=' . $net_tuition ."-". $down_payment . " / 10";
         // return json_encode(['student_id' => $Student->id, 'outstanding_balance' => $outstanding_balance, 'monthly' => $monthly]);
         
-        return view('cashier.student_payment.partials.form_modal_tuition_payment', ['student_id' => $Student->id, 'outstanding_balance' => $outstanding_balance, 'monthly' => $monthly])->render();
+        return view('cashier.student_payment.partials.form_modal_tuition_payment', ['student_id' => $Student->id, 'outstanding_balance' => $outstanding_balance, 'misc_fee' => $misc_fee, 'tuition' => $tuition , 'total_tuition' => $total_tuition, 'monthly' => $monthly, 'net_tuition_no_discount' => $net_tuition_no_discount, 'total_tuition_payment' => $total_tuition_payment, 'discount' => $discount])->render();
         $Student = Student::with([
                                     'grade', 
                                     'section', 
@@ -273,7 +277,6 @@ class StudentPaymentController extends Controller
         echo $tuition_amount_updated.  ' ' .  $StudentTuitionFee->total_tuition;
         if ($tuition_amount_updated != $StudentTuitionFee->total_tuition) // there is a changes on grade level tuition
         {
-            echo "passed 1";
             if ($StudentTuitionFee->total_payment > 0)
             {
 
@@ -361,8 +364,18 @@ class StudentPaymentController extends Controller
         {
             return json_encode(['code' => 2, 'general_message' => 'Invalid payment.']);
         }
-
         
+        $Validator = Validator::make($request->all(), [
+                                        'payment' => 'required|digits_between:3,6',
+                                        'or_number' => 'required',
+                                        'date_received' => 'required|date_format:Y-m-d'
+                                    ], [
+                                        
+                                    ]);
+        if ($Validator->fails())
+        {
+            return json_encode(['code' => 1, 'general_message' => 'Fill all required fields.', 'messages' => $Validator->getMessageBag()]);
+        }
         $Student = Student::with([
                                     'grade', 
                                     'section', 
@@ -421,11 +434,11 @@ class StudentPaymentController extends Controller
             return json_encode(['code' => 1, 'general_message' => 'Payment too large.']);
         }
 
-        $monthly_amount = 0;
+        $monthly_amount = $misc_fee + 2000;
 
-        if ($down_payment == 0)
+        // if ($down_payment == 0)
+        if ($down_payment <= $monthly_amount)
         {
-            $monthly_amount = $misc_fee + 2000;
             if ($monthly_amount > $net_tuition)
             {
                 $monthly_amount = $net_tuition;
@@ -436,22 +449,28 @@ class StudentPaymentController extends Controller
                 return json_encode(['code' => 1, 'general_message' => 'Payment too large.']);
             }
             
-            if ($monthly_amount > $remaining_payment) // if down payment is greater to down payment amount
+            $remaining_dp = $monthly_amount - $down_payment;
+
+            // if ($monthly_amount > $remaining_payment) // if down payment is greater to down payment amount
+            if ($remaining_dp > $remaining_payment)
             {
-                $StudentTuitionFee->down_payment = $remaining_payment;
+
+                $StudentTuitionFee->down_payment += $remaining_payment;
                 // $remaining_payment -= $monthly_amount;
             }
             else // down payment is less than to down payment amount
             {
-                $StudentTuitionFee->down_payment = $remaining_payment;
+                $StudentTuitionFee->down_payment = $monthly_amount;
                 // $remaining_payment = 0;
             }
         }
         else
         {
-            $monthly_amount = ($net_tuition - $down_payment) / 10;
+            $monthly_amount = ($total_tuition - ($misc_fee + 2000)) / 10;
+            // $monthly_amount = ($net_tuition - $down_payment) / 10;
         }
-
+        
+        $monthly_amount = ($total_tuition - ($misc_fee + 2000)) / 10;
         $remaining_payment = $StudentTuitionFee->total_payment - $StudentTuitionFee->down_payment;
 
         if ($remaining_payment > 0)
@@ -824,6 +843,8 @@ class StudentPaymentController extends Controller
         $StudentPaymentLog->student_id  = $request->id;
         $StudentPaymentLog->payment     = $request->payment;
         $StudentPaymentLog->payment_type= 1;
+        $StudentPaymentLog->received_date= \Carbon\Carbon::parse($request->date_received)->format('Y-m-d H:i:s');
+        $StudentPaymentLog->or_number= $request->or_number;
         $StudentPaymentLog->received_by = Auth::user()->id;
         $StudentPaymentLog->save();
 
