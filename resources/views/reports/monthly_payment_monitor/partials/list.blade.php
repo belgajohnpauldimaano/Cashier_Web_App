@@ -1,10 +1,10 @@
 <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_monitor') }}" id="form_monthly_payment_monitor_report" method="POST">
     {{ csrf_field() }}   
-    <input type="text" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
-    <input type="text" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
-    <input type="text" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
-    <input type="text" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
-    <input type="text" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
+    <input type="hidden" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
+    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
+    <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
+    <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
+    <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
 </form>
 
 

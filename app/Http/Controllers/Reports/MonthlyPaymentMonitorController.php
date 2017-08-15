@@ -140,16 +140,17 @@ class MonthlyPaymentMonitorController extends Controller
         
         $selected_monts = '';
         
-        if ($request->filter_month != '' && $request->filter_month_to != '')
+        if ($request->report_filter_month != '' && $request->report_filter_month_to != '')
         {
-            for($i=$request->filter_month;$i<=$request->filter_month;$i++)
+            for($i=$request->report_filter_month - 1;$i<=$request->report_filter_month_to;$i++)
             {
                 $selected_monts .= $month_array[$i];
             }
+            $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id ' . $selected_monts ;
         }
 
         // $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id '. $month_array[$request->report_filter_month - 1] ;
-        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id ' . $selected_monts ;
+        
         $Student = Student::with([
                                 'grade', 
                                 'section', 

@@ -66,12 +66,12 @@
                     <th>Student Name</th>
                     <th>Grade / Section</th>
                     <th>Down Payment</th>
-                    @if ($request['filter_month'] == '' || $request['filter_month_to'] == '')
+                    @if ($request['report_filter_month'] == '' || $request['report_filter_month_to'] == '')
                         @foreach($months_array as $mon)
                             <th>{{ $mon }}</th>
                         @endforeach
                     @else
-                        @for($i=$request['filter_month']-1;$i<$request['filter_month_to'];$i++)
+                        @for($i=$request['report_filter_month']-1;$i<$request['report_filter_month_to'];$i++)
                             <th>{{ $months_array[$i] }}</th>
                         @endfor
                     @endif 
@@ -234,15 +234,15 @@
                                 </td> 
                             @else
                                 
-                                @for($i=$request['filter_month']-1;$i<$request['filter_month_to'];$i++)
+                                @for($i=$request['report_filter_month']-1;$i<$request['report_filter_month_to'];$i++)
                                     <td>
                                         @if ($student->tuition[0][$month_field[$i]] < $monthly_amount)
                                             <span class="text-red">
-                                            &#8369; {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
+                                                {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
                                             </span>
                                         @else
                                             <span class="text-green">
-                                            &#8369; {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
+                                                {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
                                             </span>
                                         @endif  
                                     </td>
