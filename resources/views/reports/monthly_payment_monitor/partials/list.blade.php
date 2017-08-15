@@ -1,9 +1,10 @@
 <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_monitor') }}" id="form_monthly_payment_monitor_report" method="POST">
     {{ csrf_field() }}   
-    <input type="hidden" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
-    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
-    <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
-    <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
+    <input type="text" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
+    <input type="text" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
+    <input type="text" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
+    <input type="text" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
+    <input type="text" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
 </form>
 
 
@@ -16,12 +17,14 @@
         <th>Student Name</th>
         <th>Grade / Section</th>
         <th>Down Payment</th>
-        @if ($request['filter_month'] == '')
+        @if ($request['filter_month'] == '' || $request['filter_month_to'] == '')
             @foreach($months_array as $mon)
                 <th>{{ $mon }}</th>
             @endforeach
         @else
-            <th>{{ $months_array[$request['filter_month']-1] }}</th>
+            @for($i=$request['filter_month']-1;$i<$request['filter_month_to'];$i++)
+                <th>{{ $months_array[$i] }}</th>
+            @endfor
         @endif
         <th>Balance</th>
     </tr>
@@ -176,20 +179,21 @@
                                 </span>
                             @endif
                     </td> 
-                @else
-                    <td>
-                    
-                              @if ($student->tuition[0]->month < $monthly_amount)
-                                <span class="text-red">
-                                   &#8369; {{ a_number_format($student->tuition[0]->month) }}
-                                </span>
-                            @else
-                                <span class="text-green">
-                                   &#8369; {{ a_number_format($student->tuition[0]->month) }}
-                                </span>
-                            @endif  
-                    </td>
-                @endif
+                    @else
+                        @for($i=$request['filter_month']-1;$i<$request['filter_month_to'];$i++)
+                            <td>
+                                @if ($student->tuition[0][$month_field[$i]] < $monthly_amount)
+                                    <span class="text-red">
+                                    &#8369; {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
+                                    </span>
+                                @else
+                                    <span class="text-green">
+                                    &#8369; {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
+                                    </span>
+                                @endif  
+                            </td>
+                        @endfor
+                    @endif
                 
                 <td>
                     <span class="text-red">&#8369; {{ a_number_format($outstanding_balance) }}</span>

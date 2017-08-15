@@ -66,8 +66,26 @@
                     <div class="row">
                         <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
-                                <label for="">Filter Month</label>
+                                <label for="">Filter Month From</label>
                                 <select name="filter_month" id="filter_month" class="form-control js-search_filters">
+                                    <option value="" selected>All</option>
+                                    <option value="1">June</option>
+                                    <option value="2">July</option>
+                                    <option value="3">August</option>
+                                    <option value="4">September</option>
+                                    <option value="5">October</option>
+                                    <option value="6">November</option>
+                                    <option value="7">December</option>
+                                    <option value="8">January</option>
+                                    <option value="9">February</option>
+                                    <option value="10">March</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3"> 
+                            <div class="form-group">
+                                <label for="">Filter Month To</label>
+                                <select name="filter_month_to" id="filter_month_to" class="form-control js-search_filters">
                                     <option value="" selected>All</option>
                                     <option value="1">June</option>
                                     <option value="2">July</option>
@@ -96,6 +114,7 @@
                     <input type="hidden" id="report_filter_grade"  name="report_filter_grade">
                     <input type="hidden" id="report_filter_section" name="report_filter_section" >
                     <input type="hidden" id="report_filter_month" name="report_filter_month">
+                    <input type="hidden" id="report_filter_month_to" name="report_filter_month_to">
                 </form>
                 <div class="pull-right">
                     {{ $Students->links('admin.manage_student.partials.student_data_list_pagination') }}
