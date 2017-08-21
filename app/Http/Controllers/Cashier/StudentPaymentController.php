@@ -367,7 +367,7 @@ class StudentPaymentController extends Controller
         
         $Validator = Validator::make($request->all(), [
                                         'payment' => 'required|digits_between:3,6',
-                                        'or_number' => 'required',
+                                        'or_number' => 'required|unique:student_payment_logs',
                                         'date_received' => 'required|date_format:Y-m-d'
                                     ], [
                                         
@@ -471,7 +471,7 @@ class StudentPaymentController extends Controller
         }
         
         $monthly_amount = ($total_tuition - ($misc_fee + 2000)) / 10;
-        $remaining_payment = $StudentTuitionFee->total_payment - $StudentTuitionFee->down_payment;
+        $remaining_payment = $StudentTuitionFee->total_payment - $StudentTuitionFee->down_payment - $StudentTuitionFee->month_1_payment - $StudentTuitionFee->month_2_payment - $StudentTuitionFee->month_3_payment - $StudentTuitionFee->month_4_payment - $StudentTuitionFee->month_5_payment - $StudentTuitionFee->month_6_payment - $StudentTuitionFee->month_7_payment - $StudentTuitionFee->month_8_payment - $StudentTuitionFee->month_9_payment - $StudentTuitionFee->month_10_payment;
 
         if ($remaining_payment > 0)
         {
@@ -1509,15 +1509,23 @@ class StudentPaymentController extends Controller
                                 ->where('status', 1)
                                 ->orderBy('grade_id', 'ASC')
                                 ->get();
-        // $StudentTuitionFee = StudentTuitionFee::selectRaw('sum(total_remaining) as total_tuition_balance, sum(additional_fee) as total_additional_fee')
-        //                             ->first();
-        // return json_encode($Students);
-        // PDF::setOptions(['dpi' => 150, 'defaultFont' => 'sans-serif']);
-        $pdf = PDF::loadView('cashier.student_payment.report.pdf_student_summary_balance', ['Students' => $Students]);
-        return $pdf->stream();
-        // return $pdf->download('Balance-Summary-List.pdf');
+        $selected_grade = 'All';
+        $selected_section = 'All';
+        if ($request->pdf_filter_grade)
+        {
+            $selected_grade = Grade::where('id', $request->pdf_filter_grade)->first()->grade;
+        }
 
-        return view('cashier.student_payment.report.pdf_student_summary_balance', ['Students' => $Students, 'StudentTuitionFee' => $StudentTuitionFee]);
+        if ($request->pdf_filter_section)
+        {
+            $selected_section = Section::where('id', $request->pdf_filter_section)->first()->section_name;
+        }
+        $pdf = PDF::loadView('cashier.student_payment.report.pdf_student_summary_balance', ['Students' => $Students, 'selected_grade' => $selected_grade, 'selected_section' => $selected_section]);
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $canvas = $dom_pdf ->get_canvas();
+        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
+        return $pdf->stream();
     }
     
     public function student_summary_simple_balance (Request $request)
@@ -1571,8 +1579,11 @@ class StudentPaymentController extends Controller
         }
 
         $pdf = PDF::loadView('cashier.student_payment.report.pdf_student_summary_simple_balance', ['Students' => $Students, 'grade_selected' => $grade_selected, 'section_selected' => $section_selected]);
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $canvas = $dom_pdf ->get_canvas();
+        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
         return $pdf->stream();
-        return view('cashier.student_payment.report.pdf_student_summary_simple_balance', ['Students' => $Students, 'StudentTuitionFee' => $StudentTuitionFee, 'grade_selected' => $grade_selected, 'section_selected' => $section_selected]);
     }
     
 }

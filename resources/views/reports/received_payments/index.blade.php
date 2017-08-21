@@ -77,6 +77,19 @@
                                 <input type="text" id="filter_end_date" name="filter_end_date" class="form-control  datepicker">
                             </div>
                         </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3"> 
+                            <div class="form-group">
+                                <label for="">Payment Type</label>
+                                <select name="payment_type" id="payment_type" class="form-control js-search_filters">
+                                    <option value="" selected>All</option>
+                                    <option value="1">Tuition Fee</option>
+                                    <option value="6">Other Fees Only</option>
+                                    @foreach (\App\AdditionalFee::ADDITIONAL_FEES as $key => $additional_fee_types)
+                                        <option value="{{ $key }}">{{ $additional_fee_types['fee_name'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     
                     <button class="btn btn-flat btn-primary btn-sm js-btn_search_filters" type="button"><i class="fa fa-search"></i> Search</button>
@@ -125,6 +138,7 @@
                         <th>OR Number</th>
                         <th>Date Received</th>
                         <th>Received by</th>
+                        <th>Actions</th>
                     </tr>
                     <tbody>
                         @foreach ($StudentPaymentLog as $data)
@@ -139,7 +153,7 @@
                                     @if ($data->payment_type == 1)
                                         <span class="label bg-green">Tuition Fee Payment</span>
                                     @else
-                                        <span class="label bg-blue">Other Additional Payments</span>
+                                        <span class="label {{ \App\AdditionalFee::ADDITIONAL_FEES[$data->payment_type]['css_style'] }}">{{ \App\AdditionalFee::ADDITIONAL_FEES[$data->payment_type]['fee_name'] }}</span>
                                     @endif
                                 </td>
                                 <td>
@@ -157,6 +171,9 @@
                                     @else
                                         <span>n/a</span>
                                     @endif
+                                </td>
+                                <td>
+                                    <button class="btn btn-flat btn-primary btn-sm">Edit Amount</button>
                                 </td>
                             </tr>
                         @endforeach

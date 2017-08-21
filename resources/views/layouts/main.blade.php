@@ -1,6 +1,6 @@
 @include('layouts.nav')
 
-<body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
+<body class="hold-transition skin-blue sidebar-mini sidebar-collapse fixed">
 <div class="wrapper">
 
   <header class="main-header">
@@ -162,6 +162,7 @@
           {{--  <li class="film"><a href="{{ route('admin.manage_discounts.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Discounts</span></a></li>  --}}
         @elseif (Auth::user()->role == 2)
             <li class="film"><a href="{{ route('cashier.student_payment.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Student Payment</span></a></li>
+            <li class="film"><a href="{{ route('cashier.student_additional_payment.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Additional Payments</span></a></li> 
             <li class="film"><a href="{{ route('reports.receivedpayments.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Received Payments</span></a></li> 
             <li class="film"><a href="{{ route('reports.monthly_payment_monitor.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Monthly Payment Monitor</span></a></li> 
         @elseif (Auth::user()->role == 3)

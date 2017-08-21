@@ -42,4 +42,9 @@ class Student extends Model
     {
         return $this->hasMany(AdditionalFee::class, 'grade_id', 'grade_id');
     }
+
+    public function additional_fee_payment ()
+    {
+        return $this->hasOne(AdditionalFeePayment::class, 'student_id', 'id');
+    }
 }

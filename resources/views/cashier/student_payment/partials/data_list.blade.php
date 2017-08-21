@@ -27,10 +27,8 @@
                         <th>Net Tuition</th>
                         <th>Paid Tuition</th>
                         <th>Outstanding Balance</th>
-                        <th>Additional Fees</th> 
-                        <th>Additional Fees Paid</th>   
-                        {{--  <th>Remaining Balance</th>  --}}
-                        {{--  <th>Additional Fee Balance</th>  --}}
+                        {{--  <th>Additional Fees</th> 
+                        <th>Additional Fees Paid</th>   \  --}}
                         <th>Actions</th>
                     </tr>
                     <tbody>
@@ -53,8 +51,8 @@
                                 
                                 $tuition_fee = ($tuition + $student->grade_tuition[0]->misc_fee);
                                 $net_tuition = ($tuition + $student->grade_tuition[0]->misc_fee) - $discount;
-                                $additional_fee_total = 0;
-                                $additiona_fee_total_payment = $student->tuition[0]->additional_fee_total;
+                                //$additional_fee_total = 0;
+                                //$additiona_fee_total_payment = $student->tuition[0]->additional_fee_total;
                                 
                                 $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
                                 if ($outstanding_balance <= 0)
@@ -97,36 +95,29 @@
                                         {{ a_number_format( $student->tuition[0]->total_payment) }}
                                     @endif
                                 </td>
+                                   
                                 <td>
                                         {{ a_number_format( $outstanding_balance) }}
                                 </td>
-                                <td>
+                                {{--  <td>
                                     @if ($student->additional_fee)
-                                        @foreach($student->additional_fee as $additional)
+                                        @foreach($student->additional_fee as $additional)   --}}
                                             <?php  
-                                                $additional_fee_total += $additional->additional_amount; 
+                                                //$additional_fee_total += $additional->additional_amount; 
                                             ?>
-                                        @endforeach
+                                         {{--  @endforeach
                                         {{ a_number_format($additional_fee_total - $additiona_fee_total_payment) }}
                                     @endif
-                                </td>
+                                </td>  
+                                 <td>
+                                         {{ a_number_format( $student->tuition[0]->additional_fee_total) }} 
+                                </td>   --}}
                                 <td>
-                                        {{ a_number_format( $student->tuition[0]->additional_fee_total) }}
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                           <i class="fa fa-bars"></i>
-                                        </button>
-                                        <ul class="dropdown-menu pull-right">
-                                            @if ($outstanding_balance > 0) 
-                                                <li><a href="#" class="js-pay_tuition" data-id="{{ $student->id }}">Pay Tuition</a></li>
-                                            @endif
-                                            @if ($additional_fee_total > 0) 
-                                                <li><a href="#" class="js-pay_addtional" data-id="{{ $student->id }}">Pay Other Fees</a></li>
-                                            @endif
-                                        </ul>
-                                    </div>
+                                    @if ($outstanding_balance > 0) 
+                                        <button class="btn btn-primary btn-flat btn-sm js-pay_tuition" data-id="{{ $student->id }}">Pay</button>    
+                                    @else
+                                        <button class="btn btn-primary btn-flat btn-sm js-pay_tuition" data-id="{{ $student->id }}">View (Paid)</button>    
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

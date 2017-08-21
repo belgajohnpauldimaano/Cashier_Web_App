@@ -60,6 +60,14 @@ Route::group(['prefix' => 'cashier', 'middleware' => 'auth'], function () {
         Route::post('student-summary-simple-balance', 'Cashier\StudentPaymentController@student_summary_simple_balance')->name('cashier.student_payment.student_summary_simple_balance');
         
     });
+    Route::group(['prefix' => 'student-additional-payment'], function () {
+        Route::get('', 'Cashier\StudentAdditionalPaymentController@index')->name('cashier.student_additional_payment.index');
+        Route::post('list-data', 'Cashier\StudentAdditionalPaymentController@list_data')->name('cashier.student_additional_payment.list_data');
+        Route::post('form-modal-additional-payment', 'Cashier\StudentAdditionalPaymentController@form_modal_additional_payment')->name('cashier.student_additional_payment.form_modal_additional_payment');
+        Route::post('process-payment', 'Cashier\StudentAdditionalPaymentController@process_payment')->name('cashier.student_additional_payment.process_payment');
+        Route::post('student-additional-fee-report', 'Cashier\StudentAdditionalPaymentController@student_additional_fee_report')->name('cashier.student_additional_payment.student_additional_fee_report');
+        
+    });
 
 });
 

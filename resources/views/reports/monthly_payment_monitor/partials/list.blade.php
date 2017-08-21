@@ -17,14 +17,14 @@
         <th>Student Name</th>
         <th>Grade / Section</th>
         <th>Down Payment</th>
-        @if ($request['filter_month'] == '' && $request['filter_month_to'] == '')
-            @foreach($months_array as $mon)
-                <th>{{ $mon }}</th>
-            @endforeach
-        @else
+        @if ($request['filter_month'] != '' && $request['filter_month_to'] != '')
             @for($i=$request['filter_month']-1;$i<$request['filter_month_to'];$i++)
                 <th>{{ $months_array[$i] }}</th>
             @endfor
+        @else
+            @foreach($months_array as $mon)
+                <th>{{ $mon }}</th>
+            @endforeach
         @endif
         <th>Balance</th>
     </tr>

@@ -98,7 +98,7 @@ class StudentController extends Controller
 
         if ($request->id)
         {
-            $Student = Student::where('id', $request->id)->first();
+            $Student = Student::with('additional_fee_payment')->where('id', $request->id)->first();
 
             /**
              *  THIS CODE IS FOR CHANGES ON GRADE THAT COULD CHANGE ALSO TUITION FEE
@@ -160,6 +160,13 @@ class StudentController extends Controller
             $StudentDiscountList->student_id = $Student->id;
             $StudentDiscountList->save();
 
+            if ($Student->additional_fee_payment == NULL)
+            {
+                $AdditionalFeePayment = new \App\AdditionalFeePayment();
+                $AdditionalFeePayment->student_id = $Student->id;
+                $AdditionalFeePayment->save();
+            }
+
             return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
         }
 
@@ -195,13 +202,11 @@ class StudentController extends Controller
             $StudentTuitionFee = new StudentTuitionFee();
             $StudentTuitionFee->student_id  = $Student->id;
             $StudentTuitionFee->school_year = $this->formulate_sy();
-            //$StudentTuitionFee->total_tuition = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
-            //$StudentTuitionFee->total_remaining = $TuitionFee->tuition_fee + $TuitionFee->misc_fee;
-            //$StudentTuitionFee->additional_fee_remaining   = $add_fee;
-            // $StudentTuitionFee->additional_fee_total  = $add_fee;
-            //$StudentTuitionFee->total_discount  = $discount_sum;
             $StudentTuitionFee->save();
 
+            $AdditionalFeePayment = new \App\AdditionalFeePayment();
+            $AdditionalFeePayment->student_id = $Student->id;
+            $AdditionalFeePayment->save();
             DB::commit();
             return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
         }

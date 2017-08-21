@@ -5,6 +5,8 @@
     <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
     <input type="hidden" id="filter_start_date" name="filter_start_date" value="{{ $request['filter_start_date'] }}">
     <input type="hidden" id="filter_end_date" name="filter_end_date" value="{{ $request['filter_end_date'] }}">
+    <input type="hidden" id="report_payment_type" name="report_payment_type" value="{{ $request['payment_type'] }}">
+    
 </form>
 
 
@@ -32,6 +34,7 @@
         <th>OR Number</th>
         <th>Date Received</th>
         <th>Received by</th>
+        <th>Actions</th>
     </tr>
     <tbody>
         @foreach ($StudentPaymentLog as $data)
@@ -46,7 +49,7 @@
                     @if ($data->payment_type == 1)
                         <span class="label bg-green">Tuition Fee Payment</span>
                     @else
-                        <span class="label bg-blue">Other Additional Payments</span>
+                        <span class="label {{ \App\AdditionalFee::ADDITIONAL_FEES[$data->payment_type]['css_style'] }}">{{ \App\AdditionalFee::ADDITIONAL_FEES[$data->payment_type]['fee_name'] }}</span>
                     @endif
                 </td>
                 <td>
@@ -64,6 +67,9 @@
                     @else
                         <span>n/a</span>
                     @endif
+                </td>
+                <td>
+                    <button class="btn btn-flat btn-primary btn-sm">Edit Amount</button>
                 </td>
             </tr>
         @endforeach
