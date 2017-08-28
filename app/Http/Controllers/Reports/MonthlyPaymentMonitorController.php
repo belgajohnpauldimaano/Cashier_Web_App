@@ -18,10 +18,15 @@ class MonthlyPaymentMonitorController extends Controller
     {
         $StudentTuitionFee = StudentTuitionFee::with(['student'])->paginate(10);
 
+        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
+        $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
+        
+        
         $Student = Student::with([
                                     'grade', 
                                     'section', 
-                                    'tuition' => function ($query) {
+                                    'tuition' => function ($query) use ($select_columns) {
+                                        $query->selectRaw($select_columns);
                                         $query->where('status', 1);
                                     },
                                     'grade.tuition_fee' => function ($query) {
@@ -44,8 +49,19 @@ class MonthlyPaymentMonitorController extends Controller
                             'October', 'November',
                             'December', 'January',
                             'February', 'March'];
-        // return json_encode([$Student]);
-        return view('reports.monthly_payment_monitor.index', ['StudentTuitionFee' => $StudentTuitionFee, 'Grade' => $Grade, 'Section' => $Section, 'months_array' => $months_array, 'Students' => $Student]);
+        $month_field = [
+            'm1',
+            'm2',
+            'm3',
+            'm4',
+            'm5',
+            'm6',
+            'm7',
+            'm8',
+            'm9',
+            'm10',
+        ];
+        return view('reports.monthly_payment_monitor.index', ['StudentTuitionFee' => $StudentTuitionFee, 'Grade' => $Grade, 'Section' => $Section, 'months_array' => $months_array, 'Students' => $Student, 'month_field' => $month_field]);
     }
 
     public function list (Request $request)
@@ -60,25 +76,18 @@ class MonthlyPaymentMonitorController extends Controller
             $pages = $request->show_count;
         }
 
-        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment, month_2_payment, month_3_payment, month_4_payment, month_5_payment, month_6_payment, month_7_payment, month_8_payment, month_9_payment, month_10_payment';
+        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
         $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
-        $selected_months = '';
+        // $selected_months = '';
         
-        if ($request->filter_month != '' && $request->filter_month_to != '')
-        {
-            for($i=$request->filter_month - 1;$i< $request->filter_month_to;$i++)
-            {
-                $selected_months .= $month_array[$i];
-            }
-            $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id '. $selected_months;
-        }
-
-        // if ($request->filter_month)
+        // if ($request->filter_month != '' && $request->filter_month_to != '')
         // {
-        //     $month_array = ['month_1_payment', 'month_2_payment', 'month_3_payment', 'month_4_payment', 'month_5_payment', 'month_6_payment', 'month_7_payment', 'month_8_payment', 'month_9_payment', 'month_10_payment'];
-        //     $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, '. $month_array[$request->filter_month - 1] .' as month';
+        //     for($i=$request->filter_month - 1;$i< $request->filter_month_to;$i++)
+        //     {
+        //         $selected_months .= $month_array[$i];
+        //     }
+        //     $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id '. $selected_months;
         // }
-        // echo $select_columns;
         $Student = Student::with([
                                 'grade', 
                                 'section', 
@@ -135,21 +144,9 @@ class MonthlyPaymentMonitorController extends Controller
     {
 
         
-        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment, month_2_payment, month_3_payment, month_4_payment, month_5_payment, month_6_payment, month_7_payment, month_8_payment, month_9_payment, month_10_payment';
+        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
         $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
         
-        $selected_monts = '';
-        
-        if ($request->report_filter_month != '' && $request->report_filter_month_to != '')
-        {
-            for($i=$request->report_filter_month - 1;$i<$request->report_filter_month_to;$i++)
-            {
-                $selected_monts .= $month_array[$i];
-            }
-            $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id ' . $selected_monts ;
-        }
-
-        // $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id '. $month_array[$request->report_filter_month - 1] ;
         
         $Student = Student::with([
                                 'grade', 

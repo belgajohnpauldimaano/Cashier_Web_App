@@ -90,6 +90,19 @@ class StudentAdditionalPaymentController extends Controller
 
         }
 
+        $AdditionalFeePayment = AdditionalFeePayment::where('student_id', $request->id)->first();
+
+        if ($AdditionalFeePayment == NULL)
+        {
+            $Student = Student::where('id', $request->id)->first();
+            if ($Student != NULL)
+            {
+                $AdditionalFeePayment = new \App\AdditionalFeePayment();
+                $AdditionalFeePayment->student_id = $request->id;
+                $AdditionalFeePayment->save();
+            }
+        }
+
         $Student = Student::with(['grade', 
                                     'section', 
                                     'tuition' => function ($query) {

@@ -138,7 +138,7 @@
                         <th>OR Number</th>
                         <th>Date Received</th>
                         <th>Received by</th>
-                        <th>Actions</th>
+                        {{--  <th>Actions</th>  --}}
                     </tr>
                     <tbody>
                         @foreach ($StudentPaymentLog as $data)
@@ -172,9 +172,9 @@
                                         <span>n/a</span>
                                     @endif
                                 </td>
-                                <td>
+                                {{--  <td>
                                     <button class="btn btn-flat btn-primary btn-sm">Edit Amount</button>
-                                </td>
+                                </td>  --}}
                             </tr>
                         @endforeach
                     </tbody>

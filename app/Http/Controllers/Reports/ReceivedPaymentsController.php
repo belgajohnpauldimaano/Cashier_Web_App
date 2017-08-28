@@ -86,7 +86,6 @@ class ReceivedPaymentsController extends Controller
                                             }
                                         })
                                         ->paginate($pages);
-
         $payment_sum = StudentPaymentLog::where(function ($query) use ($request){
                                             
                                             if ($request->filter_start_date)
@@ -98,7 +97,7 @@ class ReceivedPaymentsController extends Controller
                                             {
                                                 $query->where('created_at', '<', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
                                             }
-                                            
+
                                             if ($request->payment_type)
                                             {
                                                 if ($request->payment_type == 1)

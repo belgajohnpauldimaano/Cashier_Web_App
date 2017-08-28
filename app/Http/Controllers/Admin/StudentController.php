@@ -207,7 +207,27 @@ class StudentController extends Controller
             $AdditionalFeePayment = new \App\AdditionalFeePayment();
             $AdditionalFeePayment->student_id = $Student->id;
             $AdditionalFeePayment->save();
+
+
             DB::commit();
+            
+            // $Student_data = Student::with([
+            //                         'grade', 
+            //                         'section', 
+            //                         'tuition' => function ($query) {
+            //                             $query->where('status', 1);
+            //                         },
+            //                         'grade.tuition_fee' => function ($query) {
+            //                             $query->where('status', 1);
+            //                         },
+            //                         'discount_list',
+            //                         'grade_tuition',
+            //                         'additional_fee'
+            //                     ])
+            //                     ->where('status', 1)
+            //                     ->where('id', $Student->id)
+            //                     ->first();
+                                
             return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
         }
         catch (Exception $e)

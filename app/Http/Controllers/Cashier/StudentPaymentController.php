@@ -79,6 +79,11 @@ class StudentPaymentController extends Controller
                                     }
                                 })
                                 ->where('status', 1)
+                                // ->selectRaw('
+                                //     ROUND(
+                                //         (students.first_name IN("john", "paul")) * 100, 0) 
+                                //     as email_rating
+                                // ')
                                 ->orderBy('grade_id', 'ASC')
                                 ->paginate($pages);
         // return json_encode(['Students' => $Students, 'request' => $request->all()]);
@@ -226,12 +231,11 @@ class StudentPaymentController extends Controller
         // payment made
         $total_tuition_payment = $Student->tuition[0]->total_payment;
         $down_payment = $Student->tuition[0]->down_payment;
-
         $net_tuition = $total_tuition - $discount;
         $net_tuition_no_discount = $total_tuition - $total_tuition_payment;
         $outstanding_balance = $net_tuition - $total_tuition_payment;
 
-        $monthly = $misc_fee + 2000;
+        $monthly = $misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
 
         if ($down_payment < $monthly)
         // if ($down_payment == 0)
@@ -247,7 +251,7 @@ class StudentPaymentController extends Controller
             // $monthly = ($net_tuition - $down_payment) / 10;
             $monthly = ($total_tuition - $down_payment) / 10;
         }
-
+        
         if ($monthly > $outstanding_balance)
         {
             $monthly = $outstanding_balance;
@@ -434,7 +438,7 @@ class StudentPaymentController extends Controller
             return json_encode(['code' => 1, 'general_message' => 'Payment too large.']);
         }
 
-        $monthly_amount = $misc_fee + 2000;
+        $monthly_amount = $misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
 
         // if ($down_payment == 0)
         if ($down_payment <= $monthly_amount)
