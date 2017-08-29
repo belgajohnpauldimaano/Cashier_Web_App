@@ -47,31 +47,18 @@
                                 
                 $tuition_fee = ($tuition + $student->grade_tuition[0]->misc_fee);
                 $net_tuition = ($tuition - $discount) +  $student->grade_tuition[0]->misc_fee;
+                $upon_enrollment = $student->grade_tuition[0]->upon_enrollment;
                 $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
-                $tmp_tuition = ($tuition + $student->grade_tuition[0]->misc_fee) - ($discount + $student->grade_tuition[0]->misc_fee + 2000);
-
-                if ($tuition - $discount < 2000)
-                {
-                    $tmp_tuition = ($tuition + $student->grade_tuition[0]->misc_fee) - ($discount + $student->grade_tuition[0]->misc_fee + ($tuition - $discount));
-                }
+                $tmp_tuition = (($tuition - $discount) + $student->grade_tuition[0]->misc_fee) - $student->tuition[0]->down_payment;
 
                 $left_unpaid_down = 0;
-                $tmp_outstanding_balance = 0;
-                if ($outstanding_balance <= 0)
-                {
-                    $outstanding_balance = 0;
-                }
                 
-                $monthly_amount = ($tuition - 2000) / 10;
+                $monthly_amount = ($tuition_fee - $upon_enrollment) / 10;
                 $tmp_monthly_amount = $monthly_amount;
 
-                if ($monthly_amount == 0)
-                {
-                    $monthly_amount = $student->grade_tuition[0]->misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
-                }
-                $left_unpaid_down = ($student->grade_tuition[0]->misc_fee + (($tuition - $discount)  >= 2000 ? 2000 : ($tuition - $discount))) - $student->tuition[0]->down_payment;
                 
-                //echo $left_unpaid_down .' = '. $student->grade_tuition[0]->misc_fee  . ' ' . (($tuition - $discount)  >= 2000 ? 2000 : ($tuition - $discount)) . '-' . $student->tuition[0]->down_payment;
+                $left_unpaid_down = $upon_enrollment - $student->tuition[0]->down_payment;
+                
                 if ($monthly_amount > $net_tuition)
                 {
                     $monthly_amount = $net_tuition;
@@ -94,7 +81,7 @@
                 </td>
                 <td>
                     @if ($student)
-                        <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
+                        <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }} / {{$upon_enrollment}}</small>
                     @endif
                 </td>
                 <td> 

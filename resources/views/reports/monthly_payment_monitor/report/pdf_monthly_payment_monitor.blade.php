@@ -98,34 +98,20 @@
                 $discount += ($student->discount_list->cash_discount  != 0 ? $student->discount_list->cash_discount * $tuition : 0);
                 $discount += ($student->discount_list->cwoir_discount  != 0 ? $student->discount_list->cwoir_discount * $tuition : 0);
                 $discount += ($student->discount_list->st_joseph_discount  != 0 ? $student->discount_list->st_joseph_discount : 0);
-                                
+                               
                 $tuition_fee = ($tuition + $student->grade_tuition[0]->misc_fee);
                 $net_tuition = ($tuition - $discount) +  $student->grade_tuition[0]->misc_fee;
+                $upon_enrollment = $student->grade_tuition[0]->upon_enrollment;
                 $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
-                
-                $tmp_tuition = ($tuition + $student->grade_tuition[0]->misc_fee) - ($discount + $student->grade_tuition[0]->misc_fee + 2000);
+                $tmp_tuition = (($tuition - $discount) + $student->grade_tuition[0]->misc_fee) - $student->tuition[0]->down_payment;
 
-                if ($tuition - $discount < 2000)
-                {
-                    $tmp_tuition = ($tuition + $student->grade_tuition[0]->misc_fee) - ($discount + $student->grade_tuition[0]->misc_fee + ($tuition - $discount));
-                }
                 $left_unpaid_down = 0;
-                $tmp_outstanding_balance = 0;
-                if ($outstanding_balance <= 0)
-                {
-                    $outstanding_balance = 0;
-                }
                 
-                $monthly_amount = ($tuition - 2000) / 10;
+                $monthly_amount = ($tuition_fee - $upon_enrollment) / 10;
                 $tmp_monthly_amount = $monthly_amount;
 
-                if ($monthly_amount == 0)
-                {
-                    $monthly_amount = $student->grade_tuition[0]->misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
-                }
-                $left_unpaid_down = $student->grade_tuition[0]->misc_fee + 2000;
                 
-                $left_unpaid_down = ($student->grade_tuition[0]->misc_fee + (($tuition - $discount)  >= 2000 ? 2000 : ($tuition - $discount))) - $student->tuition[0]->down_payment;
+                $left_unpaid_down = $upon_enrollment - $student->tuition[0]->down_payment;
                 
                 if ($monthly_amount > $net_tuition)
                 {
@@ -153,7 +139,7 @@
                     @endif
                 </td>
                 <td class="text-right"> 
-                    <span class="text-red"> {{ a_number_format($student->tuition[0]->down_payment) }}</span>
+                    <span class="text-red"> {{ a_number_format($student->tuition[0]->down_payment) }} / {{ $upon_enrollment }}</span>
                 </td>
                 @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                     @for($i=0;$i<10;$i++)

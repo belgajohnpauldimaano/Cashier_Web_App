@@ -214,6 +214,7 @@ class StudentPaymentController extends Controller
         $discount = 0;
         $tuition = $Student->grade_tuition[0]->tuition_fee; 
         $misc_fee = $Student->grade_tuition[0]->misc_fee;
+        $upon_enrollment = $Student->grade_tuition[0]->upon_enrollment;
         $total_tuition = $tuition + $misc_fee; 
 
         $discount += ($Student->discount_list->scholar != 0 ? $Student->discount_list->scholar * $tuition : 0);
@@ -235,131 +236,40 @@ class StudentPaymentController extends Controller
         $net_tuition_no_discount = $total_tuition - $total_tuition_payment;
         $outstanding_balance = $net_tuition - $total_tuition_payment;
 
-        $monthly = $misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
+        // $monthly = $misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
 
-        if ($down_payment < $monthly)
-        // if ($down_payment == 0)
-        {
-            $monthly = $monthly - $down_payment;
-            if ($monthly > $net_tuition && $down_payment == 0)
-            {
-                $monthly = $net_tuition;
-            }
-        }
-        else
-        {
-            // $monthly = ($net_tuition - $down_payment) / 10;
-            $monthly = ($total_tuition - $down_payment) / 10;
-        }
+        // if ($down_payment < $monthly)
+        // // if ($down_payment == 0)
+        // {
+        //     $monthly = $monthly - $down_payment;
+        //     if ($monthly > $net_tuition && $down_payment == 0)
+        //     {
+        //         $monthly = $net_tuition;
+        //     }
+        // }
+        // else
+        // {
+        //     // $monthly = ($net_tuition - $down_payment) / 10;
+        //     $monthly = ($total_tuition - $down_payment) / 10;
+        // }
         
-        if ($monthly > $outstanding_balance)
+        // if ($monthly > $outstanding_balance)
+        // {
+        //     $monthly = $outstanding_balance;
+        // }
+
+        $monthly = ($total_tuition - $upon_enrollment) / 10;
+        
+        if ($down_payment < $upon_enrollment)
+        {
+            $monthly = $upon_enrollment - $down_payment;
+        }
+        else if ($monthly > $outstanding_balance)
         {
             $monthly = $outstanding_balance;
         }
-        // echo $monthly.  '=' . $net_tuition ."-". $down_payment . " / 10";
-        // return json_encode(['student_id' => $Student->id, 'outstanding_balance' => $outstanding_balance, 'monthly' => $monthly]);
-        
-        return view('cashier.student_payment.partials.form_modal_tuition_payment', ['student_id' => $Student->id, 'outstanding_balance' => $outstanding_balance, 'misc_fee' => $misc_fee, 'tuition' => $tuition , 'total_tuition' => $total_tuition, 'monthly' => $monthly, 'net_tuition_no_discount' => $net_tuition_no_discount, 'total_tuition_payment' => $total_tuition_payment, 'discount' => $discount])->render();
-        $Student = Student::with([
-                                    'grade', 
-                                    'section', 
-                                    'tuition' => function ($query) {
-                                        $query->where('status', 1);
-                                    },
-                                    'grade.tuition_fee' => function ($query) {
-                                        $query->where('status', 1);
-                                    },
-                                ])
-                                ->where('status', 1)
-                                ->where('id', $request->id)
-                                ->first();
-        
-        
-        $StudentTuitionFee = StudentTuitionFee::where('student_id', $request->id)->first();
 
-        $tuition_amount_updated = $Student->grade->tuition_fee[0]->tuition_fee + $Student->grade->tuition_fee[0]->misc_fee;
-        echo $tuition_amount_updated.  ' ' .  $StudentTuitionFee->total_tuition;
-        if ($tuition_amount_updated != $StudentTuitionFee->total_tuition) // there is a changes on grade level tuition
-        {
-            if ($StudentTuitionFee->total_payment > 0)
-            {
-
-                $new_dp = $Student->grade->tuition_fee[0]->misc_fee + 2000;
-                $new_tuition = $tuition_amount_updated;
-                $new_monthly_payment = 0;
-                // $old_total_payment  = $StudentTuitionFee->total_tuition;
-                $old_total_payment      = $StudentTuitionFee->total_payment;
-                $old_dp                 = $StudentTuitionFee->down_payment;
-                $old_total_tuition      = $StudentTuitionFee->total_tuition;
-
-                $dp = 0;
-                if ($new_dp > $old_dp)
-                {
-                    $dp = $old_dp;
-                    $StudentTuitionFee->down_payment = $old_dp;
-                    $old_total_payment -= $old_dp;
-                }
-                else if ($new_dp < $old_dp)
-                {
-                    $dp = $new_dp;
-                    $StudentTuitionFee->down_payment = $new_dp;
-                    $old_total_payment -= $new_dp;
-                }
-
-                $new_remaining_tuition_payment -= $new_tuition - $dp;
-                $new_monthly_payment = $new_remaining_tuition_payment  / 10;
-
-                if ($new_remaining_tuition_payment >= $new_monthly_payment) // check if there is a remaining if we deduct the remaining to monthly payment
-                {
-                    $StudentTuitionFee->month_1_payment = $new_monthly_payment;
-                    $new_remaining_tuition_payment -= $new_monthly_payment;
-                }
-                else if ($new_remaining_tuition_payment != 0)
-                {
-                    $StudentTuitionFee->month_1_payment = $new_remaining_tuition_payment;
-                    $new_remaining_tuition_payment -= $new_monthly_payment;
-                }
-            
-            }
-            else // no payment was added yet
-            {
-                echo "fsdfa";
-            }
-
-
-        }
-        // echo "no changes";
-        return;
-
-        $monthly_amount = 0;
-        if ($StudentTuitionFee->monthly_payment == 0)
-        {
-            $monthly_amount = $StudentTuitionFee->total_remaining / 10;
-            $StudentTuitionFee->monthly_payment = $monthly_amount;
-        }
-        else
-        {
-            $monthly_amount = $StudentTuitionFee->monthly_payment;
-        }
-
-        $tuition_amount = $monthly_amount ;
-        if ($StudentTuitionFee->down_payment == 0)
-        {
-            $tuition_amount = $Student->grade->tuition_fee[0]->misc_fee + 2000;
-        }
-        else
-        {
-            if ($StudentTuitionFee->total_remaining < $monthly_amount)
-            {
-                $tuition_amount = $StudentTuitionFee->total_remaining ;
-            }
-        }
-
-        // return json_encode(['Student' => $Student, 'tuition_amount' => $tuition_amount]);
-
-        $remaining_tuition = $Student->tuition[0]->total_remaining;
-        
-        return view('cashier.student_payment.partials.form_modal_tuition_payment', ['tuition_amount' => $tuition_amount, 'remaining_tuition' => $remaining_tuition, 'Student' => $Student])->render();
+        return view('cashier.student_payment.partials.form_modal_tuition_payment', ['student_id' => $Student->id, 'outstanding_balance' => $outstanding_balance, 'misc_fee' => $misc_fee, 'tuition' => $tuition , 'total_tuition' => $total_tuition, 'monthly' => $monthly, 'net_tuition_no_discount' => $net_tuition_no_discount, 'total_tuition_payment' => $total_tuition_payment, 'discount' => $discount, 'upon_enrollment' => $upon_enrollment])->render();
     }
 
     public function tuition_payment_process (Request $request)
@@ -407,6 +317,7 @@ class StudentPaymentController extends Controller
         $discount = 0;
         $tuition = $Student->grade_tuition[0]->tuition_fee; 
         $misc_fee = $Student->grade_tuition[0]->misc_fee;
+        $upon_enrollment = $Student->grade_tuition[0]->upon_enrollment;
         $total_tuition = $tuition + $misc_fee; 
 
         $discount += ($Student->discount_list->scholar != 0 ? $Student->discount_list->scholar * $tuition : 0);
@@ -433,15 +344,24 @@ class StudentPaymentController extends Controller
         $net_tuition = $total_tuition - $discount;
         $outstanding_balance = $net_tuition - $total_tuition_payment;
 
+        $monthly_amount = ($total_tuition - $upon_enrollment) / 10;
+        
         if ($StudentTuitionFee->total_payment > $net_tuition)
         {
             return json_encode(['code' => 1, 'general_message' => 'Payment too large.']);
         }
 
-        $monthly_amount = $misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition);
-
-        // if ($down_payment == 0)
-        if ($down_payment <= $monthly_amount)
+        
+        if ($down_payment < $upon_enrollment)
+        {
+            $monthly_amount = $upon_enrollment - $down_payment;
+        }
+        else if ($monthly_amount > $outstanding_balance)
+        {
+            $monthly = $outstanding_balance;
+        }
+        
+        if ($down_payment < $upon_enrollment)
         {
             if ($monthly_amount > $net_tuition)
             {
@@ -453,30 +373,20 @@ class StudentPaymentController extends Controller
                 return json_encode(['code' => 1, 'general_message' => 'Payment too large.']);
             }
             
-            $remaining_dp = $monthly_amount - $down_payment;
 
-            // if ($monthly_amount > $remaining_payment) // if down payment is greater to down payment amount
-            if ($remaining_dp > $remaining_payment)
+            if ($monthly_amount > $remaining_payment)
             {
-
-                $StudentTuitionFee->down_payment += $remaining_payment;
-                // $remaining_payment -= $monthly_amount;
+                $monthly_amount = $remaining_payment;
             }
-            else // down payment is less than to down payment amount
-            {
-                $StudentTuitionFee->down_payment = $monthly_amount;
-                // $remaining_payment = 0;
-            }
-        }
-        else
-        {
-            $monthly_amount = ($total_tuition - ($misc_fee + 2000)) / 10;
-            // $monthly_amount = ($net_tuition - $down_payment) / 10;
+            
+            $StudentTuitionFee->down_payment += $monthly_amount;
         }
         
-        $monthly_amount = ($total_tuition - ($misc_fee + 2000)) / 10;
+        
+        $monthly_amount = ($total_tuition - $upon_enrollment) / 10;
         $remaining_payment = $StudentTuitionFee->total_payment - $StudentTuitionFee->down_payment - $StudentTuitionFee->month_1_payment - $StudentTuitionFee->month_2_payment - $StudentTuitionFee->month_3_payment - $StudentTuitionFee->month_4_payment - $StudentTuitionFee->month_5_payment - $StudentTuitionFee->month_6_payment - $StudentTuitionFee->month_7_payment - $StudentTuitionFee->month_8_payment - $StudentTuitionFee->month_9_payment - $StudentTuitionFee->month_10_payment;
 
+        
         if ($remaining_payment > 0)
         {
             if ($StudentTuitionFee->month_1_payment == 0 || $StudentTuitionFee->month_1_payment < $monthly_amount)
@@ -548,7 +458,6 @@ class StudentPaymentController extends Controller
                 
             }
         }
-        
         
         if ($remaining_payment > 0)
         {
@@ -841,6 +750,7 @@ class StudentPaymentController extends Controller
             }
         }
         
+        //return json_encode(['StudentTuitionFee'=>$StudentTuitionFee, 'monthly_amount' => $monthly_amount, 'remaining_payment' => $remaining_payment]);
         $StudentTuitionFee->save();
 
         $StudentPaymentLog = new StudentPaymentLog();
@@ -854,635 +764,7 @@ class StudentPaymentController extends Controller
 
         return json_encode(['code' => 0 ,'general_message' => 'Payment success', 'remaining_payment' => $remaining_payment, 'StudentTuitionFee' => $StudentTuitionFee]);
 
-        return json_encode(['StudentTuitionFee' => $StudentTuitionFee, 'monthly_amount' => $monthly_amount, 'remaining_payment' => $remaining_payment]);
-
-        // return json_encode(['Student' => $Student]);
-        // $Student = Student::with([
-        //                             'grade', 
-        //                             'section', 
-        //                             'tuition' => function ($query) {
-        //                                 $query->where('status', 1);
-        //                             },
-        //                             'grade.tuition_fee' => function ($query) {
-        //                                 $query->where('status', 1);
-        //                             },
-        //                         ])
-        //                         ->where('status', 1)
-        //                         ->where('id', $request->id)
-        //                         ->first();
-        
-        // $StudentTuitionFee = StudentTuitionFee::where('student_id', $request->id)->first();
-
-        // if ($StudentTuitionFee->total_remaining <= 0)
-        // {
-        //     return json_encode(['code' => 2, 'general_message' => 'Already paid.']);
-        // }
-
-        // $tuition_amount = 0;
-        
-        // $down_payment_amount = $Student->grade->tuition_fee[0]->misc_fee + 2000;
-
-        // $down_payment_amount_balance = $request->payment - $down_payment_amount;
-        
-        // $remaining_payment = $request->payment;
-        // // $StudentTuitionFee->down_payment    = 1000;
-        // // $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - 1000;
-        // if ($StudentTuitionFee->down_payment == 0)
-        // {
-        //     if ($down_payment_amount_balance > 0) // if down payment is greater to down payment amount
-        //     {
-        //         $StudentTuitionFee->down_payment = $down_payment_amount;
-        //         $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $down_payment_amount;
-        //         $remaining_payment = $down_payment_amount_balance;
-        //     }
-        //     else // down payment is less than to down payment amount
-        //     {
-        //         $StudentTuitionFee->down_payment = $request->payment;
-        //         $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $request->payment;
-        //         $remaining_payment = 0;
-        //     }
-        // }
-
-        // // $remaining_payment = $down_payment_amount - $request->payment;
-        // // $remaining_tuition = $Student->tuition[0]->total_remaining;
-        
-        // $monthly_amount = 0;
-        // if ($StudentTuitionFee->monthly_payment == 0)
-        // {
-        //     $monthly_amount = $StudentTuitionFee->total_remaining / 10;
-        //     $StudentTuitionFee->monthly_payment = $monthly_amount;
-            
-        //     $total_discount = $StudentTuitionFee->total_discount;
-
-        //     // discount - 10th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_10_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_10_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-
-        //     // discount - 9th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_9_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_9_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-            
-        //     // discount - 8th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_8_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_8_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 7th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_7_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_7_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 6th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_6_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_6_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 5th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_5_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_5_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 4th month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_4_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_4_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 3rd month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_3_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_3_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 2nd month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_2nd_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_2nd_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        //     // discount - 1st month
-        //     if ($total_discount > 0)
-        //     {
-        //         if ($total_discount > $monthly_amount)
-        //         {
-        //             $StudentTuitionFee->month_1_payment = $monthly_amount;
-        //             $total_discount -= $monthly_amount;
-        //             $StudentTuitionFee->total_remaining -= $monthly_amount;
-        //         }
-        //         else
-        //         {
-        //             $StudentTuitionFee->month_1_payment = $total_discount;
-        //             $total_discount = 0;
-        //             $StudentTuitionFee->total_remaining -= $total_discount;
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     $monthly_amount = $StudentTuitionFee->monthly_payment;
-        // }
-
-        // // 1st month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_1_payment == 0 || $StudentTuitionFee->month_1_payment < $monthly_amount)
-        //     { 
-
-        //             if ($StudentTuitionFee->month_1_payment <= 0)
-        //             {
-        //                 if ($remaining_payment > $monthly_amount)
-        //                 {
-        //                     $StudentTuitionFee->month_1_payment += $monthly_amount;
-        //                     $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                     $remaining_payment = $remaining_payment - $monthly_amount;
-        //                 }
-        //                 else
-        //                 {
-        //                     $StudentTuitionFee->month_1_payment += $remaining_payment; 
-        //                     $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                     $remaining_payment = 0;
-        //                 }
-        //             }
-        //             else
-        //             {
-        //                 if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_1_payment))
-        //                 {
-        //                     $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_1_payment);
-        //                     $StudentTuitionFee->month_1_payment += $to_be_deduct;
-        //                     $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                     $remaining_payment = $remaining_payment - $to_be_deduct;
-        //                 }
-        //                 else
-        //                 {
-        //                     $StudentTuitionFee->month_1_payment += $remaining_payment; 
-        //                     $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                     $remaining_payment = 0;
-        //                 }
-        //             }
-                
-        //     }
-        // }
-        // // return json_encode(['code' => 0 ,'general_message' => 'Payment success', 'remaining_payment' => $remaining_payment, 'StudentTuitionFee' => $StudentTuitionFee]);
-        // // 2nd month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_2_payment == 0 || $StudentTuitionFee->month_2_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_2_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_2_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_2_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_2_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_2_payment);
-        //                 $StudentTuitionFee->month_2_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_2_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 3nd month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_3_payment == 0 || $StudentTuitionFee->month_3_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_3_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_3_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_3_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_3_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_3_payment);
-        //                 $StudentTuitionFee->month_3_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_3_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 4th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_4_payment == 0 || $StudentTuitionFee->month_4_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_4_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_4_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_4_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_4_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_4_payment);
-        //                 $StudentTuitionFee->month_4_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_4_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 5th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_5_payment == 0 || $StudentTuitionFee->month_5_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_5_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_5_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_5_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_5_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_5_payment);
-        //                 $StudentTuitionFee->month_5_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_5_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 6th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_6_payment == 0 || $StudentTuitionFee->month_6_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_6_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_6_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_6_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_6_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_6_payment);
-        //                 $StudentTuitionFee->month_6_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_6_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 7th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_7_payment == 0 || $StudentTuitionFee->month_7_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_7_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_7_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_7_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_7_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_7_payment);
-        //                 $StudentTuitionFee->month_7_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_7_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 8th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_8_payment == 0 || $StudentTuitionFee->month_8_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_8_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_8_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_8_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_8_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_8_payment);
-        //                 $StudentTuitionFee->month_8_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_8_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 9th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_9_payment == 0 || $StudentTuitionFee->month_9_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_9_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_9_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_9_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_9_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_9_payment);
-        //                 $StudentTuitionFee->month_9_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_9_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-        // // 10th month
-        // if ($remaining_payment > 0)
-        // {
-        //     if ($StudentTuitionFee->month_10_payment == 0 || $StudentTuitionFee->month_10_payment < $monthly_amount)
-        //     { 
-        //         if ($StudentTuitionFee->month_10_payment <= 0)
-        //         {
-        //             if ($remaining_payment >= $monthly_amount)
-        //             {
-        //                 $StudentTuitionFee->month_10_payment += $monthly_amount;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $monthly_amount;
-        //                 $remaining_payment = $remaining_payment - $monthly_amount;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_10_payment += $remaining_payment;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //         else
-        //         {
-        //             if ($remaining_payment >= ($monthly_amount - $StudentTuitionFee->month_10_payment))
-        //             {
-        //                 $to_be_deduct = ($monthly_amount - $StudentTuitionFee->month_10_payment);
-        //                 $StudentTuitionFee->month_10_payment += $to_be_deduct;
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $to_be_deduct;
-        //                 $remaining_payment = $remaining_payment - $to_be_deduct;
-        //             }
-        //             else
-        //             {
-        //                 $StudentTuitionFee->month_10_payment += $remaining_payment; 
-        //                 $StudentTuitionFee->total_remaining = $StudentTuitionFee->total_remaining - $remaining_payment;
-        //                 $remaining_payment = 0;
-        //             }
-        //         }
-        //     }
-        // }
-
-        // if ($StudentTuitionFee->total_remaining <= 0)
-        // {
-        //     $StudentTuitionFee->total_remaining = 0;
-        //     $StudentTuitionFee->fully_paid = 1;
-        // }
-
-        $StudentTuitionFee->save();
-
-        $StudentPaymentLog = new StudentPaymentLog();
-        $StudentPaymentLog->student_id  = $request->id;
-        $StudentPaymentLog->payment     = $request->payment;
-        $StudentPaymentLog->payment_type= 2;
-        $StudentPaymentLog->received_by = 1;
-        $StudentPaymentLog->save();
-
-        return json_encode(['code' => 0 ,'general_message' => 'Payment success', 'remaining_payment' => $remaining_payment, 'StudentTuitionFee' => $StudentTuitionFee]);
-    }
+  }
 
     public function student_summary_balance (Request $request)
     {
@@ -1534,8 +816,108 @@ class StudentPaymentController extends Controller
     
     public function student_summary_simple_balance (Request $request)
     {
+        $Students = Student::with(['grade', 
+                                    'section', 
+                                    'tuition' => function ($query) {
+                                        $query->where('status', 1);
+                                    },
+                                    'discount_list',
+                                    'grade_tuition',
+                                    'additional_fee'
+                                ])
+                                ->where(function ($query) use ($request){
+                                    $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->pdf_search_filter ."%' ");
+                                    if ($request->pdf_filter_grade)
+                                    {
+                                        $query->where('grade_id', $request->pdf_filter_grade);
+                                    }
+                                    if ($request->pdf_filter_section)
+                                    {
+                                        $query->where('section_id', $request->pdf_filter_section);
+                                    }
+                                })
+                                ->where('status', 1)
+                                ->orderBy('grade_id', 'ASC')
+                                ->get();
+        $grade_selected = 'All';
+        $section_selected = 'All';
+        if ($request->pdf_filter_grade)
+        {
+            $Grade = Grade::where('id', $request->pdf_filter_grade)->first();
+            if ($Grade)
+            {
+                $grade_selected = $Grade->grade;
+            }
+        }
+        if ($request->pdf_filter_section)
+        {
+            $Section = Section::where('id', $request->pdf_filter_section)->first();
+            if ($Section)
+            {
+                $section_selected = $Section->section_name;
+            }
+        }
+        
+        $pdf = PDF::loadView('cashier.student_payment.report.pdf_student_summary_simple_balance', ['Students' => $Students, 'grade_selected' => $grade_selected, 'section_selected' => $section_selected]);
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $canvas = $dom_pdf ->get_canvas();
+        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
+        return $pdf->stream();
 
 
+
+
+        $student_data = [];
+        $summary_balance = [];
+        if ($request->pdf_filter_grade)
+        {
+            $Grade = Grade::where('id', $request->pdf_filter_grade)->first();
+            if ($Grade)
+            {
+                $grade_selected = $Grade->grade;
+            }
+        }
+        else
+        {
+            $Grade = Grade::all(['id']);
+            if ($Grade)
+            {
+                $grade_selected = $Grade;
+
+                foreach ($grade_selected as $grade)
+                {
+                    $grd_id = $grade->id;
+                    $student_data[] = Student::with(['grade', 
+                                            'section', 
+                                            'tuition' => function ($query) {
+                                                $query->where('status', 1);
+                                            },
+                                            'discount_list',
+                                            'grade_tuition',
+                                            'additional_fee'
+                                        ])
+                                        ->where(function ($query) use ($request, $grd_id){
+                                            $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->pdf_search_filter ."%' ");
+
+                                            
+                                            $query->where('grade_id', $grd_id);
+
+                                            if ($request->pdf_filter_section)
+                                            {
+                                                $query->where('section_id', $request->pdf_filter_section);
+                                            }
+                                        })
+                                        ->where('status', 1)
+                                        // ->groupBy('grade_id')
+                                        // ->having('grade_id', $grd_id)
+                                        ->orderBy('grade_id', 'ASC')
+                                        ->get();
+                }
+
+            }
+        }
+        return json_encode($student_data);
         $Students = Student::with(['grade', 
                                     'section', 
                                     'tuition' => function ($query) {
@@ -1570,6 +952,14 @@ class StudentPaymentController extends Controller
             if ($Grade)
             {
                 $grade_selected = $Grade->grade;
+            }
+        }
+        else
+        {
+            $Grade = Grade::all(['grade']);
+            if ($Grade)
+            {
+                $grade_selected = $Grade;
             }
         }
 

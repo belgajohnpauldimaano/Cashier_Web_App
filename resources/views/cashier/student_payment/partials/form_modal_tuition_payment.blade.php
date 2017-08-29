@@ -63,6 +63,14 @@
                             </td>
                         </tr>
                         <tr>
+                            <th>Payment Upon Enrollement</th>
+                            <td>
+                                <h5 class="text-red">
+                                    &#8369; {{ a_number_format($upon_enrollment) }}
+                                </h5>
+                            </td>
+                        </tr>
+                        <tr>
                             <th>Total tuition payment</th>
                             <td>
                                 <h5 class="text-red">

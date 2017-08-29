@@ -87,6 +87,7 @@ class ManageFeeController extends Controller
                                         ->first();
         $TuitionFee->tuition_fee    = $request->tuition_fee;
         $TuitionFee->misc_fee       = $request->misc_fee;
+        $TuitionFee->upon_enrollment= $request->upon_enrollment;
         $TuitionFee->save();
 
         $AdditionalFee = \App\AdditionalFee::where('id', $request->book_id)

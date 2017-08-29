@@ -28,6 +28,12 @@
                         <input type="text" class="form-control" name="misc_fee" id="misc_fee" value="{{ ($TuitionFee ? $TuitionFee->misc_fee : '' ) }}">
                         <div class="help-block text-center" id="misc_fee-error"></div>
                     </div>
+                    
+                    <div class="form-group">
+                        <label for="">Payment Upon Enrollemnt <span class="text-red">*</span></label>
+                        <input type="text" class="form-control" name="upon_enrollment" id="upon_enrollment" value="{{ ($TuitionFee ? $TuitionFee->upon_enrollment : '' ) }}">
+                        <div class="help-block text-center" id="upon_enrollment-error"></div>
+                    </div>
                                         
                     @if ($AdditionalFee)
                         @foreach ($AdditionalFee as $data)
