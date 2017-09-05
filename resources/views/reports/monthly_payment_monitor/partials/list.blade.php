@@ -7,6 +7,15 @@
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
 </form>
 
+<form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_summary_monitor') }}" id="form_monthly_payment_summary_monitor_report" method="POST">
+    {{ csrf_field() }}   
+    <input type="hidden" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
+    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
+    <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
+    <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
+    <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
+</form>
+
 
 <div class="pull-right">
     {{ $Students->links('admin.manage_student.partials.student_data_list_pagination') }}
@@ -34,15 +43,15 @@
                 $discount = 0;
                 $tuition = $student->grade_tuition[0]->tuition_fee; 
                 
-                $discount += ($student->discount_list->scholar != 0 ? $student->discount_list->scholar * $tuition : 0);
-                $discount += ($student->discount_list->school_subsidy != 0 ? $student->discount_list->school_subsidy : 0);
+                $discount += ($student->discount_list->scholar          != 0 ? $student->discount_list->scholar * $tuition : 0);
+                $discount += ($student->discount_list->school_subsidy   != 0 ? $student->discount_list->school_subsidy : 0);
                 $discount += ($student->discount_list->employee_scholar != 0 ? $student->discount_list->employee_scholar * $tuition : 0);
-                $discount += ($student->discount_list->gov_subsidy  != 0 ? $student->discount_list->gov_subsidy  : 0);
-                $discount += ($student->discount_list->acad_scholar  != 0 ? $student->discount_list->acad_scholar * $tuition : 0);
-                $discount += ($student->discount_list->family_member  != 0 ? $student->discount_list->family_member * $tuition : 0);
-                $discount += ($student->discount_list->nbi_alumni  != 0 ? $student->discount_list->nbi_alumni * $tuition : 0);
-                $discount += ($student->discount_list->cash_discount  != 0 ? $student->discount_list->cash_discount * $tuition : 0);
-                $discount += ($student->discount_list->cwoir_discount  != 0 ? $student->discount_list->cwoir_discount * $tuition : 0);
+                $discount += ($student->discount_list->gov_subsidy      != 0 ? $student->discount_list->gov_subsidy  : 0);
+                $discount += ($student->discount_list->acad_scholar     != 0 ? $student->discount_list->acad_scholar * $tuition : 0);
+                $discount += ($student->discount_list->family_member    != 0 ? $student->discount_list->family_member * $tuition : 0);
+                $discount += ($student->discount_list->nbi_alumni       != 0 ? $student->discount_list->nbi_alumni * $tuition : 0);
+                $discount += ($student->discount_list->cash_discount    != 0 ? $student->discount_list->cash_discount * $tuition : 0);
+                $discount += ($student->discount_list->cwoir_discount   != 0 ? $student->discount_list->cwoir_discount * $tuition : 0);
                 $discount += ($student->discount_list->st_joseph_discount  != 0 ? $student->discount_list->st_joseph_discount : 0);
                                 
                 $tuition_fee = ($tuition + $student->grade_tuition[0]->misc_fee);

@@ -33,6 +33,10 @@ class StudentPaymentController extends Controller
                                     'additional_fee'
                                 ])
                                 ->where('status', 1)
+                                ->where(function ($query) {
+                                    $query->where('grade_id', 1);
+                                    $query->where('section_id', 1);
+                                })
                                 ->orderBy('grade_id', 'ASC')
                                 ->paginate(10);
         $Student_tuition = Student::with(['grade_tuition' => function ($query) {
@@ -56,6 +60,7 @@ class StudentPaymentController extends Controller
         {
             $pages = $request->show_count;
         }
+
         $Students = Student::with(['grade', 
                                     'section', 
                                     'tuition' => function ($query) {
@@ -816,108 +821,6 @@ class StudentPaymentController extends Controller
     
     public function student_summary_simple_balance (Request $request)
     {
-        $Students = Student::with(['grade', 
-                                    'section', 
-                                    'tuition' => function ($query) {
-                                        $query->where('status', 1);
-                                    },
-                                    'discount_list',
-                                    'grade_tuition',
-                                    'additional_fee'
-                                ])
-                                ->where(function ($query) use ($request){
-                                    $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->pdf_search_filter ."%' ");
-                                    if ($request->pdf_filter_grade)
-                                    {
-                                        $query->where('grade_id', $request->pdf_filter_grade);
-                                    }
-                                    if ($request->pdf_filter_section)
-                                    {
-                                        $query->where('section_id', $request->pdf_filter_section);
-                                    }
-                                })
-                                ->where('status', 1)
-                                ->orderBy('grade_id', 'ASC')
-                                ->get();
-        $grade_selected = 'All';
-        $section_selected = 'All';
-        if ($request->pdf_filter_grade)
-        {
-            $Grade = Grade::where('id', $request->pdf_filter_grade)->first();
-            if ($Grade)
-            {
-                $grade_selected = $Grade->grade;
-            }
-        }
-        if ($request->pdf_filter_section)
-        {
-            $Section = Section::where('id', $request->pdf_filter_section)->first();
-            if ($Section)
-            {
-                $section_selected = $Section->section_name;
-            }
-        }
-        
-        $pdf = PDF::loadView('cashier.student_payment.report.pdf_student_summary_simple_balance', ['Students' => $Students, 'grade_selected' => $grade_selected, 'section_selected' => $section_selected]);
-        $pdf->output();
-        $dom_pdf = $pdf->getDomPDF();
-        $canvas = $dom_pdf ->get_canvas();
-        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
-        return $pdf->stream();
-
-
-
-
-        $student_data = [];
-        $summary_balance = [];
-        if ($request->pdf_filter_grade)
-        {
-            $Grade = Grade::where('id', $request->pdf_filter_grade)->first();
-            if ($Grade)
-            {
-                $grade_selected = $Grade->grade;
-            }
-        }
-        else
-        {
-            $Grade = Grade::all(['id']);
-            if ($Grade)
-            {
-                $grade_selected = $Grade;
-
-                foreach ($grade_selected as $grade)
-                {
-                    $grd_id = $grade->id;
-                    $student_data[] = Student::with(['grade', 
-                                            'section', 
-                                            'tuition' => function ($query) {
-                                                $query->where('status', 1);
-                                            },
-                                            'discount_list',
-                                            'grade_tuition',
-                                            'additional_fee'
-                                        ])
-                                        ->where(function ($query) use ($request, $grd_id){
-                                            $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->pdf_search_filter ."%' ");
-
-                                            
-                                            $query->where('grade_id', $grd_id);
-
-                                            if ($request->pdf_filter_section)
-                                            {
-                                                $query->where('section_id', $request->pdf_filter_section);
-                                            }
-                                        })
-                                        ->where('status', 1)
-                                        // ->groupBy('grade_id')
-                                        // ->having('grade_id', $grd_id)
-                                        ->orderBy('grade_id', 'ASC')
-                                        ->get();
-                }
-
-            }
-        }
-        return json_encode($student_data);
         $Students = Student::with(['grade', 
                                     'section', 
                                     'tuition' => function ($query) {
