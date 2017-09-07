@@ -57,7 +57,11 @@
     </head>
     <body>
         <div class="container">
+<<<<<<< HEAD
             <h2 class="text-center">Student Balance Summary Report</h2>
+=======
+            <h2 class="text-center">Student Monthly Balance Summary Report</h2>
+>>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
             <div>
             </div>
             <div class="text-right">Date Generated : {{ \Carbon\Carbon::now('Asia/Manila')->format('m, d, Y h:i a') }}</div>
@@ -129,8 +133,13 @@
                 $total_monthly_payment = 0;
                 $total_monthly_amount = 0;
             ?>
+<<<<<<< HEAD
             {{--  <tr>
                 <td>
+=======
+            {{--  <tr>  --}}
+                {{--  <td>
+>>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
                     <small>{{ $student->last_name . ', ' . $student->first_name . ' ' . $student->middle_name }}</small>
                 </td>
                 <td>
@@ -189,12 +198,112 @@
                                     $tmp_tuition = $tmp_tuition - $tmp_tuition;
                                 ?>
                             @endif
+<<<<<<< HEAD
                         </td>
                     @endfor
                 @endif
                 {{--  <td class="text-right">
                     <span class="text-red">  --}}
                         {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}  --}}
+=======
+                        {{--  </td>  --}}
+                    @endfor
+                     {{--  <td>
+                    
+                            @if ($student->tuition[0]->m1 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m1) }}</span>
+                            @else
+                                <span class="text-green">
+                                     {{ a_number_format($student->tuition[0]->m1) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m2 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m2) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m2) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m3 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m3) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m3) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m4 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m4) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m4) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m5 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m5) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m5) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m6 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m6) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m6) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m7 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m7) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m7) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m8 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m8) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m8) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m9 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m9) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m9) }}
+                                </span>
+                            @endif
+                    </td>
+                    <td>
+                            @if ($student->tuition[0]->m10 < $monthly_amount)
+                                <span class="text-red"> {{ a_number_format($student->tuition[0]->m10) }}</span>
+                            @else
+                                <span class="text-green">
+                                    {{ a_number_format($student->tuition[0]->m10) }}
+                                </span>
+                            @endif
+                    </td>   --}}
+                @endif
+                {{--  <td class="text-right">
+                    <span class="text-red">  --}}
+                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}
+>>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
                         <?php 
                             $total_receivables = $total_receivables + (($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down);
                         ?>
@@ -206,6 +315,7 @@
             </table>  --}}
 
             <div>
+<<<<<<< HEAD
                 <p>
                 <strong>
                     Grade Level -
@@ -234,6 +344,19 @@
                     @endif
                 </strong>
                 <h3 class="text-red">{{ a_number_format($total_receivables) }}</h3>
+=======
+                @if ($Students->count() > 0)
+                    <strong>Grade : {{ $Students[0]->grade->grade }}</strong>
+                    <strong>Section : {{ $Students[0]->section->section_name }}</strong>
+                    @if ($request['report_filter_month'] - $request['report_filter_month_to'] > 0)
+                        <strong>From {{ $months_array[$request['report_filter_month'] - 1] }} to {{ $months_array[$request['report_filter_month_to'] - 1] }} </strong>
+                    @else
+                        <strong>For the month of {{ $Students[0]->section->section_name }}</strong>
+                    @endif
+                    <strong>Total Receivables : </strong>
+                    <h3 class="text-red">{{ a_number_format($total_receivables) }}</h3>
+                @endif
+>>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
             </div>
         </div>
     </body>

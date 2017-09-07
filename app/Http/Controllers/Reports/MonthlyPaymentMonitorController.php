@@ -36,6 +36,8 @@ class MonthlyPaymentMonitorController extends Controller
                                     'grade_tuition',
                                     'additional_fee'
                                 ])
+                                ->where('grade_id', 1)
+                                ->where('section_id', 1)
                                 ->where('status', 1)
                                 ->where(function ($query) {
                                     $query->where('section_id', 1);
@@ -211,8 +213,6 @@ class MonthlyPaymentMonitorController extends Controller
 
     public function export_pdf_monthly_payment_summary_monitor (Request $request)
     {
-
-        
         $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
         $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
         
@@ -266,8 +266,9 @@ class MonthlyPaymentMonitorController extends Controller
             'm9',
             'm10',
         ];
-        // return json_encode($Student);
+        
         $pdf = PDF::loadView('reports.monthly_payment_monitor.report.pdf_monthly_payment_summary_monitor', [ 'request' => $request->all(), 'months_array' => $months_array, 'Students' => $Student, 'month_field' => $month_field])->setPaper('letter', 'portrait');
+
         $pdf->output();
         $dom_pdf = $pdf->getDomPDF();
         $canvas = $dom_pdf ->get_canvas();

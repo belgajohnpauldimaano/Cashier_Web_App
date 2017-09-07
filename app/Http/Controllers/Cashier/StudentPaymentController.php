@@ -43,6 +43,8 @@ class StudentPaymentController extends Controller
                                             $query->select(['grade_id', 'tuition_fee']);
                                         }
                                     ])
+                                    ->where('grade_id', 1)
+                                    ->where('section_id', 1)
                                     ->get();
         $Grade = Grade::all();
         $Section = Section::where('grade_id', 1)->get();

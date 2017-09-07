@@ -6,7 +6,6 @@
     <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
 </form>
-
 <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_summary_monitor') }}" id="form_monthly_payment_summary_monitor_report" method="POST">
     {{ csrf_field() }}   
     <input type="hidden" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
@@ -15,7 +14,6 @@
     <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
 </form>
-
 
 <div class="pull-right">
     {{ $Students->links('admin.manage_student.partials.student_data_list_pagination') }}
