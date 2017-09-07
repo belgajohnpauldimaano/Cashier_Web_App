@@ -205,4 +205,69 @@ class MonthlyPaymentMonitorController extends Controller
         $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
         return $pdf->stream();
     }
+
+    public function export_pdf_monthly_payment_summary_monitor (Request $request)
+    {
+        
+        $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
+        $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
+        
+        
+        $Student = Student::with([
+                                'grade', 
+                                'section', 
+                                'tuition' => function ($query) use ($select_columns) {
+                                    $query->selectRaw($select_columns);
+                                    $query->where('status', 1);
+                                },
+                                'grade.tuition_fee' => function ($query) {
+                                    $query->where('status', 1);
+                                },
+                                'discount_list',
+                                'grade_tuition',
+                                'additional_fee'
+                                ])
+                                ->where(function ($query) use ($request) {
+                                    $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+                                                
+                                    if ($request->report_filter_grade)
+                                    {
+                                        $query->where('grade_id', $request->report_filter_grade);
+                                    }
+
+                                    if ($request->report_filter_section)
+                                    {
+                                        $query->where('section_id', $request->report_filter_section);
+                                    }
+                                })
+                                ->where('status', 1)
+                                ->orderBy('grade_id', 'ASC')
+                                ->get();
+
+        $months_array = [
+                            'June', 'July', 
+                            'August',  'September', 
+                            'October', 'November',
+                            'December', 'January',
+                            'February', 'March'];
+        $month_field = [
+            'm1',
+            'm2',
+            'm3',
+            'm4',
+            'm5',
+            'm6',
+            'm7',
+            'm8',
+            'm9',
+            'm10',
+        ];
+        // return json_encode($Student);
+        $pdf = PDF::loadView('reports.monthly_payment_monitor.report.pdf_monthly_payment_summary_monitor', [ 'request' => $request->all(), 'months_array' => $months_array, 'Students' => $Student, 'month_field' => $month_field])->setPaper('letter', 'landscape');
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $canvas = $dom_pdf ->get_canvas();
+        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
+        return $pdf->stream();
+    }
 }
