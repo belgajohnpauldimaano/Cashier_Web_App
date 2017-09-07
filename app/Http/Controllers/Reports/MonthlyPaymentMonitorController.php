@@ -36,6 +36,8 @@ class MonthlyPaymentMonitorController extends Controller
                                     'grade_tuition',
                                     'additional_fee'
                                 ])
+                                ->where('grade_id', 1)
+                                ->where('section_id', 1)
                                 ->where('status', 1)
                                 ->orderBy('grade_id', 'ASC')
                                 ->paginate(10);

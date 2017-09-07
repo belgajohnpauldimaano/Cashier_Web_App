@@ -32,6 +32,8 @@ class StudentAdditionalPaymentController extends Controller
                                     'additional_fee',
                                     'additional_fee_payment'
                                 ])
+                                ->where('grade_id', 1)
+                                ->where('section_id', 1)
                                 ->where('status', 1)
                                 ->orderBy('grade_id', 'ASC')
                                 ->orderBy('last_name', 'ASC')
