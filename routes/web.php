@@ -77,6 +77,8 @@ Route::group(['prefix' => 'reports', 'middleware' => 'auth'], function () {
         Route::post('list', 'Reports\ReceivedPaymentsController@list')->name('reports.receivedpayments.list');
         Route::post('export-pdf-received-payments', 'Reports\ReceivedPaymentsController@export_pdf_received_payments')->name('reports.receivedpayments.export_pdf_received_payments');
         
+        Route::post('received-payments-summary-report', 'Reports\ReceivedPaymentsController@received_payments_summary_report')->name('reports.receivedpayments.received_payments_summary_report');
+        
     });
     Route::group(['prefix' => 'monthly-payment-monitor'], function () {
         Route::get('', 'Reports\MonthlyPaymentMonitorController@index')->name('reports.monthly_payment_monitor.index');

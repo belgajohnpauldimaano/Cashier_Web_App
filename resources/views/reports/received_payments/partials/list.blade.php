@@ -8,6 +8,16 @@
     <input type="hidden" id="report_payment_type" name="report_payment_type" value="{{ $request['payment_type'] }}">
     
 </form>
+<form action="{{ route('reports.receivedpayments.received_payments_summary_report') }}" id="form_received_payments_search_summary_report" method="POST">
+    {{ csrf_field() }}   
+    <input type="hidden" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
+    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
+    <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
+    <input type="hidden" id="filter_start_date" name="filter_start_date" value="{{ $request['filter_start_date'] }}">
+    <input type="hidden" id="filter_end_date" name="filter_end_date" value="{{ $request['filter_end_date'] }}">
+    <input type="hidden" id="report_payment_type" name="report_payment_type" value="{{ $request['payment_type'] }}">
+    
+</form>
 
 
 <div class="pull-left margin">

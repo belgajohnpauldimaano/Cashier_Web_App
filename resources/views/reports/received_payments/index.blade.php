@@ -26,6 +26,7 @@
                             <div class="form-group">
                                 <label for="">Grade</label>
                                 <select name="filter_grade" id="filter_grade" class="form-control js-search_filters">
+                                    <option value="">All</option>
                                     @if($Grade)
                                         @foreach ($Grade as $data)
                                             <option value="{{ $data->id }}">{{ $data->grade }}</option>
@@ -38,6 +39,7 @@
                             <div class="form-group">
                                 <label for="">Section</label>
                                 <select name="filter_section" id="filter_section" class="form-control js-search_filters">
+                                    <option value="">All</option>
                                     @if($Section)
                                         @foreach ($Section as $data)
                                             <option value="{{ $data->id }}">{{ $data->section_name }}</option>
@@ -92,6 +94,7 @@
                     
                     <button class="btn btn-flat btn-primary btn-sm js-btn_search_filters" type="button"><i class="fa fa-search"></i> Search</button>
                     <button class="btn btn-flat btn-danger btn-sm js-btn_export_pdf" type="button"><i class="fa fa-file-pdf-o"></i> export to pdf</button>
+                    <button class="btn btn-flat btn-danger btn-sm js-btn_summary_export_pdf" type="button"><i class="fa fa-file-pdf-o"></i> export summary to pdf</button>
                 </form>
             </div> 
 
@@ -103,6 +106,16 @@
                     <input type="hidden" id="report_filter_section" name="report_filter_section" >
                     <input type="hidden" id="filter_start_date" name="filter_start_date">
                     <input type="hidden" id="filter_end_date" name="filter_end_date">
+                </form>
+                <form action="{{ route('reports.receivedpayments.received_payments_summary_report') }}" id="form_received_payments_search_summary_report" method="POST">
+                    {{ csrf_field() }}   
+                    <input type="hidden" id="report_search_filter" name="report_search_filter" value="">
+                    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="">
+                    <input type="hidden" id="report_filter_section" name="report_filter_section" value="">
+                    <input type="hidden" id="filter_start_date" name="filter_start_date" value="">
+                    <input type="hidden" id="filter_end_date" name="filter_end_date" value="">
+                    <input type="hidden" id="report_payment_type" name="report_payment_type" value="">
+                    
                 </form>
                 <div class="pull-left margin">
                     @if ($payment_sum->sum)
@@ -229,6 +242,15 @@
         $('body').on('click', '.js-btn_export_pdf', function (e) {
             e.preventDefault();
             $('#form_received_payments_search_report').submit();
-        })
+        });
+        
+        $('body').on('submit', '#form_received_payments_search_summary_report', function () {
+            $(this).attr('target', '_blank');
+        });
+        $('body').on('click', '.js-btn_summary_export_pdf', function (e) {
+            e.preventDefault();
+            $('#form_received_payments_search_summary_report').submit();
+        });
+        
     </script>
 @endsection

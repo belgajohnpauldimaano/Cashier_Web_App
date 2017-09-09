@@ -254,4 +254,88 @@ class ReceivedPaymentsController extends Controller
 
         return view('reports.received_payments.report.pdf_receivedpayments', ['StudentPaymentLog' => $StudentPaymentLog, 'payment_sum' => $payment_sum, 'range_from' => $range_from, 'range_to' => $range_to]);
     }
+
+    public function received_payments_summary_report (Request $request)
+    {
+        $grade_payments = [];
+
+        $Grade = Grade::where(function ($query) use ($request) {
+                            if ($request->report_filter_grade)
+                            {
+                                $query->where('id', $request->report_filter_grade);
+                            }
+
+                        })
+                        ->get(['id', 'grade']);
+                        
+        foreach ($Grade as $grd)
+        {
+            $StudentPaymentLog = StudentPaymentLog::join('students', 'students.id', '=', 'student_payment_logs.student_id')
+                                                    ->where(function ($query) use ($grd) {
+                                                        $query->whereRaw('students.grade_id = ' . $grd->id);
+                                                    })
+                                                    ->where(function ($query) use ($request) {
+                                                        if ($request->filter_start_date)
+                                                        {
+                                                            $query->whereRaw('student_payment_logs.created_at >= "' . date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')) . '"');
+                                                        }
+
+                                                        if ($request->filter_end_date)
+                                                        {
+                                                            $query->whereRaw('student_payment_logs.created_at <= "' . date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')) . '"');
+                                                        }
+                                                    })
+                                                    ->where(function ($query) use ($request) {
+                                                        if ($request->report_payment_type)
+                                                        {
+                                                            if ($request->report_payment_type == 1)
+                                                            {
+                                                                $query->where('payment_type', 1);
+                                                            }
+                                                            else if ($request->report_payment_type == 6)
+                                                            {
+                                                                $query->where('payment_type', '>', 1);
+                                                            }
+                                                            else if ($request->report_payment_type > 1)
+                                                            {
+                                                                $query->where('payment_type', $request->report_payment_type);
+                                                            }
+                                                        }
+                                                    })
+                                                    ->selectRaw('
+                                                        SUM(payment) as total_payment, students.grade_id
+                                                    ')
+                                                    ->first();
+                                        // echo $grd->id;
+            // echo json_encode($StudentPaymentLog);
+            if ($StudentPaymentLog->total_payment != NULL)
+            {
+                $grade_payments[] = $StudentPaymentLog;
+            }
+        }
+
+        $range_from             = $request->filter_start_date;
+        $range_to               = $request->filter_end_date;
+        $report_payment_type    = ($request->report_payment_type ? $request->report_payment_type : 0);
+        
+        $payment_type  = [  
+            'All types of payment',
+            'Tuition Fees',
+            'Books',
+            'Speech Lab',
+            'P.E Uniform/Set',
+            'School Uniform/Set',
+            'Other Fees',
+        ];
+
+        $pdf = PDF::loadView('reports.received_payments.report.pdf_receivedpayments_summary', ['grade_payments' => $grade_payments, 'Grade' => $Grade, 'range_from' => $range_from, 'range_to' => $range_to, 'report_payment_type' => $report_payment_type, 'payment_type' => $payment_type])->setPaper('letter', 'landscape');
+        
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $canvas = $dom_pdf ->get_canvas();
+        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
+        return $pdf->stream();
+
+        return view('reports.received_payments.report.pdf_receivedpayments_summary', ['grade_payments' => $grade_payments, 'Grade' => $Grade]);
+    }
 }
