@@ -269,7 +269,7 @@
         $('body').on('submit', '#form_monthly_payment_summary_monitor_report', function () {
             $(this).attr('target', '_blank');
         });
-        $('body').on('click', '.js-btn_export_pdf', function (e) {
+        $('body').on('click', '.js-btn_export_summary_pdf', function (e) {
             e.preventDefault();
             $('#form_monthly_payment_summary_monitor_report').submit();
         })

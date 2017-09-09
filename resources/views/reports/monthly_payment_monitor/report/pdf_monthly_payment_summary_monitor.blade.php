@@ -57,11 +57,7 @@
     </head>
     <body>
         <div class="container">
-<<<<<<< HEAD
-            <h2 class="text-center">Student Balance Summary Report</h2>
-=======
             <h2 class="text-center">Student Monthly Balance Summary Report</h2>
->>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
             <div>
             </div>
             <div class="text-right">Date Generated : {{ \Carbon\Carbon::now('Asia/Manila')->format('m, d, Y h:i a') }}</div>
@@ -133,13 +129,8 @@
                 $total_monthly_payment = 0;
                 $total_monthly_amount = 0;
             ?>
-<<<<<<< HEAD
-            {{--  <tr>
-                <td>
-=======
             {{--  <tr>  --}}
                 {{--  <td>
->>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
                     <small>{{ $student->last_name . ', ' . $student->first_name . ' ' . $student->middle_name }}</small>
                 </td>
                 <td>
@@ -198,14 +189,7 @@
                                     $tmp_tuition = $tmp_tuition - $tmp_tuition;
                                 ?>
                             @endif
-<<<<<<< HEAD
-                        </td>
-                    @endfor
-                @endif
-                {{--  <td class="text-right">
-                    <span class="text-red">  --}}
-                        {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}  --}}
-=======
+                            
                         {{--  </td>  --}}
                     @endfor
                      {{--  <td>
@@ -302,8 +286,6 @@
                 @endif
                 {{--  <td class="text-right">
                     <span class="text-red">  --}}
-                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}
->>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
                         <?php 
                             $total_receivables = $total_receivables + (($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down);
                         ?>
@@ -311,40 +293,7 @@
                 </td>
             </tr>  --}}
         @endforeach
-    {{--  </tbody>
-            </table>  --}}
-
             <div>
-<<<<<<< HEAD
-                <p>
-                <strong>
-                    Grade Level -
-                    
-                    {{ $Students[0]->grade->grade }}
-                </strong>
-                </p>
-                <p>
-                <strong>
-                    Section -
-
-                    {{ $Students[0]->section->section_name }}
-                </strong>
-                </p>
-                <strong>
-                    Total Receivables :
-
-                    @if ($request['report_filter_month'] == '' || $request['report_filter_month_to'] == '')
-                        from {{$months_array[0] . ' to ' .  $months_array[9]}}
-                    @else
-                        @if ($request['report_filter_month'] - $request['report_filter_month_to'] == 0)
-                            Month of {{ $months_array[$request['report_filter_month'] - 1] }}
-                        @else
-                            from {{$months_array[$request['report_filter_month'] - 1] . ' to ' .  $months_array[$request['report_filter_month_to'] - 1]}}
-                        @endif
-                    @endif
-                </strong>
-                <h3 class="text-red">{{ a_number_format($total_receivables) }}</h3>
-=======
                 @if ($Students->count() > 0)
                     <strong>Grade : {{ $Students[0]->grade->grade }}</strong>
                     <strong>Section : {{ $Students[0]->section->section_name }}</strong>
@@ -356,7 +305,6 @@
                     <strong>Total Receivables : </strong>
                     <h3 class="text-red">{{ a_number_format($total_receivables) }}</h3>
                 @endif
->>>>>>> 40a0d83ce16cdf9d4566329958c94e338e466d7e
             </div>
         </div>
     </body>
