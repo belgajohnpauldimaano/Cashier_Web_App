@@ -164,37 +164,37 @@
                     ?>
                     <tr>
                         <td>{{ $Grade->where('id', $balance['grade_id'])->first()->grade }}</td>
-                        <td>{{ a_number_format($total_tuition) }}</td>
-                        <td>{{ a_number_format($balance['total_dp']) }} {{ $balance['month_1_payment'] }}</td>
+                        <td class="text-right">{{ a_number_format($total_tuition) }}</td>
+                        <td class="text-right">{{ a_number_format($balance['total_dp']) }}</td>
                         @for($i=$mon_from-1;$i<$mon_to;$i++)
                         {{--  @for($i=0;$i<10;$i++)  --}}
-                            <td>
+                            <td  class="text-right">
                                 {{ a_number_format($balance[$month_array_field[$i]]) }}
                             </td>
                         @endfor
                         {{--  <td>{{ a_number_format($balance['total_payment']) }}</td>  --}}
-                        <td>{{ a_number_format($total_payment + $balance['total_dp']) }}</td>
+                        <td class="text-right">{{ a_number_format($total_payment + $balance['total_dp']) }}</td>
                         
-                        <td>{{ 
+                        <td class="text-right">{{ 
                                 a_number_format($total_discount)
                             }}
                         </td>
-                        <td>{{ a_number_format($total_balance) }}</td> 
+                        <td class="text-right">{{ a_number_format($total_balance) }}</td> 
                     </tr>
                 @endforeach
                 <tr>
                     <td>Total</td>
-                    <td>{{ a_number_format($grand_total_tuition) }}</td>
-                    <td>{{ a_number_format($grand_total_dp) }}</td>
+                    <td class="text-right">{{ a_number_format($grand_total_tuition) }}</td>
+                    <td class="text-right">{{ a_number_format($grand_total_dp) }}</td>
                     @for($i=$mon_from-1;$i<$mon_to;$i++)
                     {{--  @for($i=0;$i<10;$i++)  --}}
                     {{--  @foreach ($month_total as $data)  --}}
-                        <td>{{ a_number_format($month_total[$month_field[$i]]) }}</td>
+                        <td class="text-right">{{ a_number_format($month_total[$month_field[$i]]) }}</td>
                     {{--  @endforeach  --}}
                     @endfor
-                    <td>{{ a_number_format($grand_total_payment + $grand_total_dp) }}</td>
-                    <td>{{ a_number_format($grand_total_discount) }}</td>
-                    <td>{{ a_number_format($grand_total_balance) }}</td>
+                    <td class="text-right">{{ a_number_format($grand_total_payment + $grand_total_dp) }}</td>
+                    <td class="text-right">{{ a_number_format($grand_total_discount) }}</td>
+                    <td class="text-right">{{ a_number_format($grand_total_balance) }}</td>
                 </tr>
             </tbody>
         </div>
