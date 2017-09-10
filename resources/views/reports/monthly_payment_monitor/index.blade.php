@@ -38,7 +38,7 @@
                             <div class="form-group">
                                 <label for="">Section</label>
                                 <select name="filter_section" id="filter_section" class="form-control js-search_filters">
-                                    {{--  <option value="">All</option>  --}}
+                                    <option value="">All</option>
                                     @if($Section)
                                         @foreach ($Section as $data)
                                             <option value="{{ $data->id }}">{{ $data->section_name }}</option>
@@ -105,6 +105,7 @@
                     <button class="btn btn-flat btn-primary btn-sm js-btn_search_filters" type="button"><i class="fa fa-search"></i> Search</button>
                     <button class="btn btn-flat btn-danger btn-sm js-btn_export_pdf" type="button"><i class="fa fa-file-pdf-o"></i> export to pdf</button>
                     <button class="btn btn-flat btn-danger btn-sm js-btn_export_summary_pdf" type="button"><i class="fa fa-file-pdf-o"></i> export summary to pdf</button>
+                    <button class="btn btn-flat btn-danger btn-sm js-btn_export_summary_teacher_pdf" type="button"><i class="fa fa-file-pdf-o"></i> export pdf summary for teacher</button>
                 </form>
             </div> 
 
@@ -117,6 +118,23 @@
                     <input type="hidden" id="report_filter_month" name="report_filter_month">
                     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to">
                 </form>
+                <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_summary_monitor') }}" id="form_monthly_payment_summary_monitor_report" method="POST">
+                    {{ csrf_field() }}   
+                    <input type="hidden" id="report_search_filter" name="report_search_filter" value="">
+                    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="">
+                    <input type="hidden" id="report_filter_section" name="report_filter_section" value="">
+                    <input type="hidden" id="report_filter_month" name="report_filter_month" value="">
+                    <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="">
+                </form>
+
+                <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_monitor_teacher') }}" id="form_monthly_payment_summary_monitor_teacher_report" method="POST">
+                    {{ csrf_field() }}   
+                    <input type="hidden" id="report_search_filter" name="report_search_filter" value="">
+                    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="">
+                    <input type="hidden" id="report_filter_section" name="report_filter_section" value="">
+                    <input type="hidden" id="report_filter_month" name="report_filter_month" value="">
+                    <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="">
+                </form>
                 <div class="pull-right">
                     {{ $Students->links('admin.manage_student.partials.student_data_list_pagination') }}
                 </div>
@@ -126,7 +144,9 @@
                     <tr>
                         <th>Student Name</th>
                         <th>Grade / Section</th>
+                        <th>Tuition Fee</th>
                         <th>Down Payment</th>
+                        <th>Discount</th>
                         @foreach($months_array as $mon)
                             <th>{{ $mon }}</th>
                         @endforeach
@@ -188,14 +208,17 @@
                                         <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
                                     @endif
                                 </td>
+                                <td>{{ a_number_format($tuition_fee) }}</td>
                                 <td> 
-                                    <span class="text-red"> {{ a_number_format($student->tuition[0]->down_payment) }} / {{ $upon_enrollment }}</span>
+                                    <span class="text-red"> {{ a_number_format($student->tuition[0]->down_payment) }}</span>
+                                     {{--  / {{ $upon_enrollment }}  --}}
                                 </td>
+                                <td>{{ a_number_format($discount) }}</td>
                                     @for($i=0;$i<10;$i++)
                                         <td>
                                             @if ($tmp_tuition > $tmp_monthly_amount)
                                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                                / {{a_number_format($tmp_monthly_amount)}}
+                                                {{--  / {{a_number_format($tmp_monthly_amount)}}  --}}
                                                 <?php
                                                     $tmp_tuition = $tmp_tuition - $tmp_monthly_amount;
                                                     $total_monthly_payment += $student->tuition[0][$month_field[$i]];
@@ -203,7 +226,7 @@
                                                 ?>
                                             @else
                                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                                / {{a_number_format($tmp_tuition)}}
+                                                {{--  / {{a_number_format($tmp_tuition)}}  --}}
                                                 <?php
                                                     $total_monthly_payment += $student->tuition[0][$month_field[$i]];
                                                     $total_monthly_amount += $tmp_tuition;
@@ -273,5 +296,14 @@
             e.preventDefault();
             $('#form_monthly_payment_summary_monitor_report').submit();
         })
+        
+        $('body').on('submit', '#form_monthly_payment_summary_monitor_teacher_report', function () {
+            $(this).attr('target', '_blank');
+        });
+        $('body').on('click', '.js-btn_export_summary_teacher_pdf', function (e) {
+            e.preventDefault();
+            $('#form_monthly_payment_summary_monitor_teacher_report').submit();
+        })
+        
     </script>
 @endsection

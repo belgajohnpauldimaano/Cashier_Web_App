@@ -34,8 +34,8 @@ class StudentPaymentController extends Controller
                                 ])
                                 ->where('status', 1)
                                 ->where(function ($query) {
-                                    $query->where('grade_id', 1);
-                                    $query->where('section_id', 1);
+                                    // $query->where('grade_id', 1 );
+                                    // $query->where('section_id', 1);
                                 })
                                 ->orderBy('grade_id', 'ASC')
                                 ->paginate(10);

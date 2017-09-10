@@ -306,8 +306,6 @@ class ReceivedPaymentsController extends Controller
                                                         SUM(payment) as total_payment, students.grade_id
                                                     ')
                                                     ->first();
-                                        // echo $grd->id;
-            // echo json_encode($StudentPaymentLog);
             if ($StudentPaymentLog->total_payment != NULL)
             {
                 $grade_payments[] = $StudentPaymentLog;

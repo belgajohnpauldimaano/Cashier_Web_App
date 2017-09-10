@@ -15,6 +15,15 @@
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
 </form>
 
+<form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_monitor_teacher') }}" id="form_monthly_payment_summary_monitor_teacher_report" method="POST">
+    {{ csrf_field() }}   
+    <input type="hidden" id="report_search_filter" name="report_search_filter" value="{{ $request['search_filter'] }}">
+    <input type="hidden" id="report_filter_grade"  name="report_filter_grade" value="{{ $request['filter_grade'] }}">
+    <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
+    <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
+    <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
+</form>
+
 <div class="pull-right">
     {{ $Students->links('admin.manage_student.partials.student_data_list_pagination') }}
 </div>
@@ -23,7 +32,9 @@
     <tr>
         <th>Student Name</th>
         <th>Grade / Section</th>
+        <th>Tuition Fee</th>
         <th>Down Payment</th>
+        <th>Discount</th>
         @if ($request['filter_month'] != '' && $request['filter_month_to'] != '')
             @for($i=$request['filter_month']-1;$i<$request['filter_month_to'];$i++)
                 <th>{{ $months_array[$i] }}</th>
@@ -88,19 +99,21 @@
                 </td>
                 <td>
                     @if ($student)
-                        <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }} / {{$upon_enrollment}}</small>
+                        <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
                     @endif
                 </td>
+                <td>{{ a_number_format($tuition_fee) }}</td>
                 <td> 
                 {{--  {{ a_number_format(($left_unpaid_down > 0 ? $student->grade_tuition[0]->misc_fee + ($net_tuition >= 2000 ? 2000 : $net_tuition) : $left_unpaid_down)) }}  --}}
                     <span class="text-red"> {{ a_number_format($student->tuition[0]->down_payment) }}</span>
                 </td>
+                <td>{{ a_number_format($discount) }}</td>
                 @if ($request['filter_month'] != '' && $request['filter_month_to'] != '')
                     @for($i=0;$i<10;$i++)
                         <td class="{{ (($i>=$request['filter_month'] - 1) && ($i<=$request['filter_month_to']-1) ? '' : 'hidden') }}">
                             @if ($tmp_tuition > $tmp_monthly_amount)
                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                / {{a_number_format($tmp_monthly_amount)}}
+                                {{--  / {{a_number_format($tmp_monthly_amount)}}  --}}
                                 <?php
                                     $tmp_tuition = $tmp_tuition - $tmp_monthly_amount;
                                     if (($i>=$request['filter_month'] - 1) && ($i<=$request['filter_month_to']-1))
@@ -111,7 +124,7 @@
                                 ?>
                             @else
                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                / {{a_number_format($tmp_tuition)}}
+                                {{--  / {{a_number_format($tmp_tuition)}}  --}}
                                 <?php
                                     if (($i>=$request['filter_month'] - 1) && ($i<=$request['filter_month_to']-1))
                                     {
@@ -128,7 +141,7 @@
                         <td>
                             @if ($tmp_tuition > $tmp_monthly_amount)
                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                / {{a_number_format($tmp_monthly_amount)}}
+                                {{--  / {{a_number_format($tmp_monthly_amount)}}  --}}
                                 <?php
                                     $tmp_tuition = $tmp_tuition - $tmp_monthly_amount;
                                     $total_monthly_payment += $student->tuition[0][$month_field[$i]];
@@ -136,7 +149,7 @@
                                 ?>
                             @else
                                 {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                / {{a_number_format($tmp_tuition)}}
+                                {{--  / {{a_number_format($tmp_tuition)}}  --}}
                                 <?php
                                     $total_monthly_payment += $student->tuition[0][$month_field[$i]];
                                     $total_monthly_amount += $tmp_tuition;

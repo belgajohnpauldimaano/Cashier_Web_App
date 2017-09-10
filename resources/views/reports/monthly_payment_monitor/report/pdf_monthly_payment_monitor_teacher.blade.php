@@ -69,9 +69,6 @@
                 <tr>
                     <th>Student Name</th>
                     <th>Grade / Section</th>
-                    <th>Tuition Fee</th>
-                    <th>Down Payment</th>
-                    <th>Discount</th>
                     @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                         @for($i=$request['report_filter_month']-1;$i<$request['report_filter_month_to'];$i++)
                             <th>{{ $months_array[$i] }}</th>
@@ -81,23 +78,11 @@
                             <th>{{ $mon }}</th>
                         @endforeach
                     @endif 
-                    <th>Balance</th>
+                    <th>Status</th>
                 </tr>
     <tbody>
         <?php  
-            $total_receivables = 0; 
-            $month_total        = [
-                'm1' => 0,'m2' => 0,
-                'm3' => 0,'m4' => 0,
-                'm5' => 0,'m6' => 0,
-                'm7' => 0,'m8' => 0,
-                'm9' => 0,'m10' => 0
-            ] ;
-
-            $grand_total_tuition = 0;
-            $grand_total_dp      = 0;
-            $grand_total_discount = 0;
-            $grand_total_balance = 0;
+            $status = true;
         ?>
         @foreach ($Students as $student)
             <?php
@@ -139,25 +124,6 @@
                     $monthly_amount = 0;
                 }
 
-
-                //echo $tuition_fee;
-
-                $total_monthly_payment = 0;
-                $total_monthly_amount = 0;
-
-                $grand_total_tuition += $tuition_fee;
-                $grand_total_dp += $student->tuition[0]->down_payment;
-                $grand_total_discount += $discount;
-                $month_total['m1'] += $student->tuition[0][$month_field[0]];
-                $month_total['m2'] += $student->tuition[0][$month_field[1]];
-                $month_total['m3'] += $student->tuition[0][$month_field[2]];
-                $month_total['m4'] += $student->tuition[0][$month_field[3]];
-                $month_total['m5'] += $student->tuition[0][$month_field[4]];
-                $month_total['m6'] += $student->tuition[0][$month_field[5]];
-                $month_total['m7'] += $student->tuition[0][$month_field[6]];
-                $month_total['m8'] += $student->tuition[0][$month_field[7]];
-                $month_total['m9'] += $student->tuition[0][$month_field[8]];
-                $month_total['m10'] += $student->tuition[0][$month_field[9]];
             ?>
             <tr>
                 <td>
@@ -168,97 +134,48 @@
                         <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
                     @endif
                 </td>
-                <td class="text-right">{{ a_number_format($tuition_fee) }}</td>
-                <td class="text-right"> 
-                    <span class=""> {{ a_number_format($student->tuition[0]->down_payment) }} </span> 
-                </td>
-                <td class="text-right">{{ a_number_format($discount) }}</td>
                 @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                     @for($i=0;$i<10;$i++)
-                        <td class="{{ (($i>=$request['report_filter_month'] - 1) && ($i<=$request['report_filter_month_to']-1) ? '' : 'hidden') }} text-right">
-                            @if ($tmp_tuition > $tmp_monthly_amount)
-                                {{ a_number_format($student->tuition[0][$month_field[$i]]) }} 
-                                {{--  / {{a_number_format($tmp_monthly_amount)}}  --}}
-                                <?php
-                                    $tmp_tuition = $tmp_tuition - $tmp_monthly_amount;
-                                    if (($i>=$request['report_filter_month'] - 1) && ($i<=$request['report_filter_month_to']-1))
-                                    {
-                                        $total_monthly_payment += $student->tuition[0][$month_field[$i]];
-                                        $total_monthly_amount += $tmp_monthly_amount;
-                                    }
-                                ?>
+                        <td class="{{ (($i>=$request['report_filter_month'] - 1) && ($i<=$request['report_filter_month_to']-1) ? '' : 'hidden') }}">
+                            @if ($outstanding_balance == 0)
+                                    <span class="text-green">PAID</span>
                             @else
-                                {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                {{--  / {{a_number_format($tmp_tuition)}}  --}}
-                                <?php
-                                    if (($i>=$request['report_filter_month'] - 1) && ($i<=$request['report_filter_month_to']-1))
-                                    {
-                                        $total_monthly_payment += $student->tuition[0][$month_field[$i]];
-                                        $total_monthly_amount += $tmp_tuition;
-                                    }
-                                    $tmp_tuition = $tmp_tuition - $tmp_tuition;
-                                ?>
+                                @if ($tmp_tuition > $tmp_monthly_amount)
+                                    <span class="text-red">UNPAID</span>
+                                    <?php $status = false; ?>
+                                @else
+                                    <span class="text-green">PAID</span>
+                                @endif
                             @endif
                         </td>
                     @endfor
                 @else
                     @for($i=0;$i<10;$i++)
-                        <td class="text-right">
-                            @if ($tmp_tuition > $tmp_monthly_amount)
-                                {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                {{--  / {{a_number_format($tmp_monthly_amount)}}  --}}
-                                <?php
-                                    $tmp_tuition = $tmp_tuition - $tmp_monthly_amount;
-                                    $total_monthly_payment += $student->tuition[0][$month_field[$i]];
-                                    $total_monthly_amount += $tmp_monthly_amount;
-                                ?>
+                        <td >
+                            @if ($outstanding_balance == 0)
+                                    <span class="text-green">PAID</span>
                             @else
-                                {{ a_number_format($student->tuition[0][$month_field[$i]]) }}
-                                {{--  / {{a_number_format($tmp_tuition)}}  --}}
-                                <?php
-                                    $total_monthly_payment += $student->tuition[0][$month_field[$i]];
-                                    $total_monthly_amount += $tmp_tuition;
-                                    $tmp_tuition = $tmp_tuition - $tmp_tuition;
-                                ?>
+                                @if ($tmp_tuition > $tmp_monthly_amount)
+                                    <span class="text-red">UNPAID</span>
+                                    <?php $status = false; ?>
+                                @else
+                                    <span class="text-green">PAID</span>
+                                @endif
                             @endif
-                        </td>
                     @endfor
                 @endif
-                <td class="text-right">
-                    <span class="text-red">
-                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}
-                        <?php 
-                            $total_receivables = $total_receivables + (($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down);
-                            
-                        ?>
-                    </span>
+                <td >
+                    @if ($status) 
+                        <span class="text-green">PAID</span>
+                    @else
+                        <span class="text-red">UNPAID</span>        
+                    @endif
                 </td>
             </tr>
         @endforeach
-        <tr>
-            <td colspan="2">Total</td>
-            <td class="text-right">{{ a_number_format($grand_total_tuition) }}</td>
-            <td class="text-right">{{ a_number_format($grand_total_dp) }}</td>
-            <td class="text-right">{{ a_number_format($grand_total_discount) }}</td>
-            @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
-                @for($i=$request['report_filter_month'] - 1;$i<$request['report_filter_month_to'];$i++)
-                    <td>{{ a_number_format($month_total[$month_field[$i]]) }}</td>
-                @endfor
-            @else
-                @for($i=0;$i<10;$i++)
-                    <td class="text-right">{{ a_number_format($month_total[$month_field[$i]]) }}</td>
-                @endfor
-            @endif
-            <td class="text-right">{{ a_number_format($total_receivables) }}</td>
-            
-        </tr>
     </tbody>
             </table>
 
-            <div>
-                <strong>Total Receivables : </strong>
-                <h3 class="text-red">{{ a_number_format($total_receivables) }}</h3>
-            </div>
         </div>
     </body>
 </html>
