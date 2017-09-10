@@ -149,6 +149,7 @@
                         <th>OR Number</th>
                         <th>Date Received</th>
                         <th>Received by</th>
+                        <th>Date Created</th>
                         {{--  <th>Actions</th>  --}}
                     </tr>
                     <tbody>
@@ -182,6 +183,9 @@
                                     @else
                                         <span>n/a</span>
                                     @endif
+                                </td>
+                                <td>
+                                    {{ \Carbon\Carbon::parse($data->created_at, 'Asia/Manila')->format('F d, Y') }}
                                 </td>
                                 {{--  <td>
                                     <button class="btn btn-flat btn-primary btn-sm">Edit Amount</button>

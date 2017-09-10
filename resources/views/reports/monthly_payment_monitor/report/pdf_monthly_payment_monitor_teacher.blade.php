@@ -138,11 +138,11 @@
                             @if ($outstanding_balance == 0)
                                     <span class="text-green">PAID</span>
                             @else
-                                @if ($tmp_tuition > $tmp_monthly_amount)
+                                @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)
+                                    <span class="text-green">PAID</span>
+                                @else
                                     <span class="text-red">UNPAID</span>
                                     <?php $status = false; ?>
-                                @else
-                                    <span class="text-green">PAID</span>
                                 @endif
                             @endif
                         </td>
@@ -153,11 +153,11 @@
                             @if ($outstanding_balance == 0)
                                     <span class="text-green">PAID</span>
                             @else
-                                @if ($tmp_tuition > $tmp_monthly_amount)
+                                @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)
+                                    <span class="text-green">PAID</span>
+                                @else
                                     <span class="text-red">UNPAID</span>
                                     <?php $status = false; ?>
-                                @else
-                                    <span class="text-green">PAID</span>
                                 @endif
                             @endif
                     @endfor

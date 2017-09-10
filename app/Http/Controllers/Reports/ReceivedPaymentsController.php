@@ -42,12 +42,12 @@ class ReceivedPaymentsController extends Controller
                                             
                                             if ($request->filter_start_date)
                                             {
-                                                $query->where('received_date', '>', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
+                                                $query->where('received_date', '>=', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
                                             }
 
                                             if ($request->filter_end_date)
                                             {
-                                                $query->where('received_date', '<', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
+                                                $query->where('received_date', '<=', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
                                             }
 
                                             if ($request->payment_type)
@@ -90,12 +90,12 @@ class ReceivedPaymentsController extends Controller
                                             
                                             if ($request->filter_start_date)
                                             {
-                                                $query->where('created_at', '>', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
+                                                $query->where('received_date', '>=', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
                                             }
 
                                             if ($request->filter_end_date)
                                             {
-                                                $query->where('created_at', '<', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
+                                                $query->where('received_date', '<=', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
                                             }
 
                                             if ($request->payment_type)
@@ -146,12 +146,12 @@ class ReceivedPaymentsController extends Controller
                                             
                                             if ($request->filter_start_date)
                                             {
-                                                $query->where('created_at', '>', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
+                                                $query->where('received_date', '>=', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
                                             }
 
                                             if ($request->filter_end_date)
                                             {
-                                                $query->where('created_at', '<', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
+                                                $query->where('received_date', '<=', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
                                             }
 
                                             if ($request->report_payment_type)
@@ -195,12 +195,12 @@ class ReceivedPaymentsController extends Controller
                                             
                                             if ($request->filter_start_date)
                                             {
-                                                $query->where('created_at', '>', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
+                                                $query->where('received_date', '>=', date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')));
                                             }
 
                                             if ($request->filter_end_date)
                                             {
-                                                $query->where('created_at', '<', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
+                                                $query->where('received_date', '<=', date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')));
                                             }
 
                                             if ($request->report_payment_type)
@@ -277,12 +277,12 @@ class ReceivedPaymentsController extends Controller
                                                     ->where(function ($query) use ($request) {
                                                         if ($request->filter_start_date)
                                                         {
-                                                            $query->whereRaw('student_payment_logs.created_at >= "' . date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')) . '"');
+                                                            $query->whereRaw('student_payment_logs.received_date >= "' . date('Y-m-d H:i:s', strtotime($request->filter_start_date . ' 00:00:00')) . '"');
                                                         }
 
                                                         if ($request->filter_end_date)
                                                         {
-                                                            $query->whereRaw('student_payment_logs.created_at <= "' . date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')) . '"');
+                                                            $query->whereRaw('student_payment_logs.received_date <= "' . date('Y-m-d H:i:s', strtotime($request->filter_end_date . ' 23:59:00')) . '"');
                                                         }
                                                     })
                                                     ->where(function ($query) use ($request) {
