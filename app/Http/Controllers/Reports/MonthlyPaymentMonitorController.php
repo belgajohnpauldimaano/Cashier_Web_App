@@ -266,7 +266,8 @@ class MonthlyPaymentMonitorController extends Controller
             ->where(function ($query) use ($grd) {
                 $query->whereRaw('students.grade_id = ' . $grd->id);
             })
-            ->selectRaw('students.grade_id, ' . $selected_mons_cols . ', SUM(down_payment) as total_dp, SUM(total_payment) as total_payment, SUM(tuition_fees.tuition_fee) as tuition_fee, SUM(tuition_fees.misc_fee) as misc_fee, 
+            ->selectRaw('students.grade_id, ' . $selected_mons_cols . ', SUM(down_payment) as total_dp, SUM(total_payment) as total_payment, SUM(tuition_fees.tuition_fee) as tuition_fee, SUM(tuition_fees.misc_fee) as misc_fee,
+                SUM(tuition_fees.upon_enrollment) as upon_enrollment,  
                 SUM(student_discount_lists.scholar) as total_scholar, 
                 SUM(student_discount_lists.school_subsidy) as school_subsidy,
                 SUM(student_discount_lists.employee_scholar) as employee_scholar,

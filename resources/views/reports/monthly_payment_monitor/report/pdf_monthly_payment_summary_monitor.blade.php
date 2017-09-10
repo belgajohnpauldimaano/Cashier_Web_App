@@ -122,6 +122,7 @@
                                         +
                                         ($balance['tuition_fee'] * $balance['cwoir_discount'])
                                     ) ;  
+
                         $grand_total_discount += $total_discount;
                         $month_total['m1'] += $balance['month_1_payment'];
                         $month_total['m2'] += $balance['month_2_payment'];
@@ -145,9 +146,16 @@
                         $grand_total_dp += $balance['total_dp'];
                         $grand_total_tuition += $total_tuition;
                         $grand_total_payment += $total_payment;//$balance['total_payment'];
+
+                        $total_monthly = (($balance['tuition_fee'] + $balance['misc_fee']) - $balance['upon_enrollment']) / 10;
+                        
+                        $total_for_month = $total_monthly * (($mon_to + 1) - $mon_from);
+                        
                         $total_balance = ($total_tuition - $total_discount) - $total_payment;
-                                        //$balance['total_payment'];
-                        $grand_total_balance += $total_tuition- $total_balance;
+                        
+                        $total_balance = ($total_for_month - ($total_payment + $total_discount));
+                        $grand_total_balance += $total_balance;
+
                     ?>
                     <tr>
                         <td>{{ $Grade->where('id', $balance['grade_id'])->first()->grade }}</td>
@@ -160,13 +168,14 @@
                             </td>
                         @endfor
                         {{--  <td>{{ a_number_format($balance['total_payment']) }}</td>  --}}
-                        <td>{{ a_number_format($total_payment + $balance['total_dp']) }} {{ $total_balance }} {{ ($balance['total_payment']  . ' ' .  $total_payment) }} </td>
+                        <td>{{ a_number_format($total_payment + $balance['total_dp']) }}</td>
                         
                         <td>{{ 
                                 a_number_format($total_discount)
                             }}
                         </td>
-                        <td>{{ a_number_format($total_balance - ($balance['total_payment'] - $total_payment)) }}</td>
+                        {{--  <td>{{ a_number_format($total_balance) }} </td>   --}}
+                        <td>{{ a_number_format($total_balance) }}</td> 
                     </tr>
                 @endforeach
                 <tr>
@@ -181,7 +190,7 @@
                     @endfor
                     <td>{{ a_number_format($grand_total_payment + $grand_total_dp) }}</td>
                     <td>{{ a_number_format($grand_total_discount) }}</td>
-                    <td>{{ a_number_format($grand_total_tuition - ($grand_total_payment + $grand_total_discount)) }}</td>
+                    <td>{{ a_number_format($grand_total_balance) }}</td>
                 </tr>
             </tbody>
         </div>
