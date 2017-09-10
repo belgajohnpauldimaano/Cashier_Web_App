@@ -775,8 +775,6 @@ class StudentPaymentController extends Controller
 
     public function student_summary_balance (Request $request)
     {
-
-
         $Students = Student::with(['grade', 
                                     'section', 
                                     'tuition' => function ($query) {
@@ -823,6 +821,45 @@ class StudentPaymentController extends Controller
     
     public function student_summary_simple_balance (Request $request)
     {
+        $grade_payments = [];
+        
+        $Grade = Grade::where(function ($query) use ($request) {
+                            if ($request->pdf_filter_grade)
+                            {
+                                $query->where('id', $request->pdf_filter_grade);
+                            }
+
+                        })
+                        ->get(['id', 'grade']);
+
+        
+        
+        foreach ($Grade as $grd)
+        {
+            $Students = Student::join('tuition_fees', 'tuition_fees.grade_id', 'students.grade_id')
+            ->where(function ($query) use ($grd) {
+                $query->whereRaw('students.grade_id = ' . $grd->id);
+            })
+            ->selectRaw('
+                COUNT(students.id) as no_of_students, students.grade_id, SUM(tuition_fees.tuition_fee) as total_tuition, SUM(tuition_fees.misc_fee) as total_misc,
+                SUM(tuition_fees.tuition_fee) + SUM(tuition_fees.misc_fee) as total_tuition_fee
+            ')
+            ->first();
+
+            // if ($StudentPaymentLog->total_payment != NULL)
+            // {
+                $grade_payments[] = $Students;
+            // }
+        }
+        // return json_encode($grade_payments);
+        
+        $pdf = PDF::loadView('cashier.student_payment.report.pdf_student_summary_simple_balance', ['grade_payments' => $grade_payments, 'grade_selected' => '', 'section_selected' => '', 'Grade' => $Grade]);
+        $pdf->output();
+        $dom_pdf = $pdf->getDomPDF();
+        $canvas = $dom_pdf ->get_canvas();
+        $canvas->page_text(5, 5, "Page {PAGE_NUM} of {PAGE_COUNT}", null, 7, array(0, 0, 0));
+        return $pdf->stream();
+
         $Students = Student::with(['grade', 
                                     'section', 
                                     'tuition' => function ($query) {

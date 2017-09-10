@@ -161,7 +161,8 @@
                 @endif
                 <td>
                     <span class="text-red">
-                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}
+                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment)) }} 
+                        {{--  {{ $total_monthly_amount . ' ' . $total_monthly_payment }} {{ $left_unpaid_down }}  --}}
                     </span>
                 </td>
             </tr>

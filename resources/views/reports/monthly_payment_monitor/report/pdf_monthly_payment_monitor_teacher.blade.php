@@ -81,11 +81,9 @@
                     <th>Status</th>
                 </tr>
     <tbody>
-        <?php  
-            $status = true;
-        ?>
         @foreach ($Students as $student)
             <?php
+                $status = true;
                 $discount = 0;
                 $tuition = $student->grade_tuition[0]->tuition_fee; 
                 

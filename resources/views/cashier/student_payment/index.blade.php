@@ -30,6 +30,7 @@
                             <div class="form-group">
                                 <label for="">Grade</label>
                                 <select name="filter_grade" id="filter_grade" class="form-control js-search_filters">
+                                    <option value="">All</option>
                                     @if($Grade)
                                         @foreach ($Grade as $data)
                                             <option value="{{ $data->id }}">{{ $data->grade }}</option>
@@ -42,6 +43,7 @@
                             <div class="form-group">
                                 <label for="">Section</label>
                                 <select name="filter_section" id="filter_section" class="form-control js-search_filters">
+                                    <option value="">All</option>
                                     @if($Section)
                                         @foreach ($Section as $data)
                                             <option value="{{ $data->id }}">{{ $data->section_name }}</option>
@@ -54,7 +56,7 @@
                             <div class="form-group">
                                 <label for="">Show Entries</label>
                                 <select name="show_count" id="show_count" class="form-control js-search_filters">
-                                    {{--  <option value="">All</option>  --}}
+                                    <option value="">All</option>
                                     <option value="10" selected>10</option>
                                     <option value="20">20</option>
                                     <option value="30">30</option>

@@ -98,10 +98,11 @@
 
                     $total_rm = 0;
                 ?>
-                @foreach ($grade_balance as $balance)
+                @foreach ($grade_balance as $key => $balance)
                     <?php
                         
-                        $total_discount      = (
+                        $total_discount = $student_discount[$key];
+                                    /*= (
                                         $balance['school_subsidy']
                                         +
                                         $balance['gov_subsidy']
@@ -121,7 +122,7 @@
                                         ($balance['tuition_fee'] * $balance['cash_discount'])
                                         +
                                         ($balance['tuition_fee'] * $balance['cwoir_discount'])
-                                    ) ;  
+                                    ) ;  */
 
                         $grand_total_discount += $total_discount;
                         $month_total['m1'] += $balance['month_1_payment'];
@@ -151,16 +152,20 @@
                         
                         $total_for_month = $total_monthly * (($mon_to + 1) - $mon_from);
                         
-                        $total_balance = ($total_tuition - $total_discount) - $total_payment;
-                        
-                        $total_balance = ($total_for_month - ($total_payment + $total_discount));
+                        $total_balance = ($total_tuition - $total_discount) - ($total_payment + $balance['total_dp']);
+                        /*$total_balance = $balance['month_1_payment'] + $balance['month_2_payment'] +
+                                            $balance['month_3_payment'] + $balance['month_4_payment'] +
+                                            $balance['month_5_payment'] + $balance['month_6_payment'] +
+                                            $balance['month_7_payment'] + $balance['month_8_payment'] +
+                                            $balance['month_9_payment'] + $balance['month_10_payment'] +*/
+                        //$total_balance = ($total_for_month - ($total_payment + $total_discount));
                         $grand_total_balance += $total_balance;
 
                     ?>
                     <tr>
                         <td>{{ $Grade->where('id', $balance['grade_id'])->first()->grade }}</td>
                         <td>{{ a_number_format($total_tuition) }}</td>
-                        <td>{{ a_number_format($balance['total_dp']) }}</td>
+                        <td>{{ a_number_format($balance['total_dp']) }} {{ $balance['month_1_payment'] }}</td>
                         @for($i=$mon_from-1;$i<$mon_to;$i++)
                         {{--  @for($i=0;$i<10;$i++)  --}}
                             <td>
@@ -174,7 +179,6 @@
                                 a_number_format($total_discount)
                             }}
                         </td>
-                        {{--  <td>{{ a_number_format($total_balance) }} </td>   --}}
                         <td>{{ a_number_format($total_balance) }}</td> 
                     </tr>
                 @endforeach

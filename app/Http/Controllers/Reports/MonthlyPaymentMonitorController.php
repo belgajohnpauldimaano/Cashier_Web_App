@@ -248,7 +248,8 @@ class MonthlyPaymentMonitorController extends Controller
         }
 
         $grade_balance = [];
-        
+        $student_per_grade = [];
+        $student_discount  = [];
         $Grade = Grade::where(function ($query) use ($request) {
                             if ($request->report_filter_grade)
                             {
@@ -281,14 +282,55 @@ class MonthlyPaymentMonitorController extends Controller
             ')
             ->first();
             
+            $Student = Student::with([
+                                'tuition' => function ($query) use ($select_columns) {
+                                    $query->selectRaw($select_columns);
+                                    $query->where('status', 1);
+                                },
+                                'grade.tuition_fee' => function ($query) {
+                                    $query->where('status', 1);
+                                },
+                                'discount_list',
+                                'grade_tuition',
+                                'additional_fee'
+                                ])
+                                ->where(function ($query) use ($grd) {
+                                    $query->whereRaw('students.grade_id = ' . $grd->id);
+                                })
+                                ->where('status', 1)
+                                ->get();
+
+            $student_per_grade[] = $Student;
             if ($StudentTuitionFee->grade_id != NULL)
             {
+                $discount = 0;
+    
+                foreach ($Student as $student)
+                {
+                    $tuition = $student->grade_tuition[0]->tuition_fee; 
+                    $discount += ($student->discount_list->scholar != 0 ? $student->discount_list->scholar * $tuition : 0);
+                    $discount += ($student->discount_list->school_subsidy != 0 ? $student->discount_list->school_subsidy : 0);
+                    $discount += ($student->discount_list->employee_scholar != 0 ? $student->discount_list->employee_scholar * $tuition : 0);
+                    $discount += ($student->discount_list->gov_subsidy  != 0 ? $student->discount_list->gov_subsidy  : 0);
+                    $discount += ($student->discount_list->acad_scholar  != 0 ? $student->discount_list->acad_scholar * $tuition : 0);
+                    $discount += ($student->discount_list->family_member  != 0 ? $student->discount_list->family_member * $tuition : 0);
+                    $discount += ($student->discount_list->nbi_alumni  != 0 ? $student->discount_list->nbi_alumni * $tuition : 0);
+                    $discount += ($student->discount_list->cash_discount  != 0 ? $student->discount_list->cash_discount * $tuition : 0);
+                    $discount += ($student->discount_list->cwoir_discount  != 0 ? $student->discount_list->cwoir_discount * $tuition : 0);
+                    $discount += ($student->discount_list->st_joseph_discount  != 0 ? $student->discount_list->st_joseph_discount : 0);
+    
+                }
+                
+                $student_discount[] = $discount;
                 $grade_balance[] = $StudentTuitionFee;
             }
-
+            
         }
-        // return json_encode([$grade_balance]);
-        $pdf = PDF::loadView('reports.monthly_payment_monitor.report.pdf_monthly_payment_summary_monitor', [ 'request' => $request->all(), 'grade_balance' => $grade_balance ,'months_array' => $months_array, 'mon_str_dispay' => $mon_str_dispay, 'month_array_field' => $month_array_field, 'mon_from' => $mon_from, 'mon_to' => $mon_to, 'Grade' => $Grade, 'month_field' => $month_field])->setPaper('letter', 'landscape');
+        // $student_discount = $student_discount;
+
+        // echo $student_discount->where('grd_id', 1)->first();
+        // return json_encode([$grade_balance, $student_discount]);
+        $pdf = PDF::loadView('reports.monthly_payment_monitor.report.pdf_monthly_payment_summary_monitor', [ 'request' => $request->all(), 'grade_balance' => $grade_balance ,'months_array' => $months_array, 'mon_str_dispay' => $mon_str_dispay, 'month_array_field' => $month_array_field, 'mon_from' => $mon_from, 'mon_to' => $mon_to, 'Grade' => $Grade, 'month_field' => $month_field, 'student_discount' => $student_discount])->setPaper('letter', 'landscape');
 
         $pdf->output();
         $dom_pdf = $pdf->getDomPDF();
@@ -347,7 +389,7 @@ class MonthlyPaymentMonitorController extends Controller
             'm9',
             'm10',
         ];
-        
+
         $pdf = PDF::loadView('reports.monthly_payment_monitor.report.pdf_monthly_payment_summary_monitor', [ 'request' => $request->all(), 'months_array' => $months_array, 'Students' => $Student, 'month_field' => $month_field])->setPaper('letter', 'portrait');
 
         $pdf->output();
