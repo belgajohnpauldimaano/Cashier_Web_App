@@ -269,17 +269,19 @@ class MonthlyPaymentMonitorController extends Controller
             })
             ->selectRaw('students.grade_id, ' . $selected_mons_cols . ', SUM(down_payment) as total_dp, SUM(total_payment) as total_payment, SUM(tuition_fees.tuition_fee) as tuition_fee, SUM(tuition_fees.misc_fee) as misc_fee,
                 SUM(tuition_fees.upon_enrollment) as upon_enrollment,  
-                SUM(student_discount_lists.scholar) as total_scholar, 
-                SUM(student_discount_lists.school_subsidy) as school_subsidy,
-                SUM(student_discount_lists.employee_scholar) as employee_scholar,
-                SUM(student_discount_lists.gov_subsidy) as gov_subsidy,
-                SUM(student_discount_lists.acad_scholar) as acad_scholar,
-                SUM(student_discount_lists.family_member) as family_member,
-                SUM(student_discount_lists.nbi_alumni) as nbi_alumni,
-                SUM(student_discount_lists.cash_discount) as cash_discount,
-                SUM(student_discount_lists.cwoir_discount) as cwoir_discount,
-                SUM(student_discount_lists.st_joseph_discount) as st_joseph_discount
+                SUM(student_discount_lists.scholar) as total_scholar
             ')
+            
+                // , 
+                // SUM(student_discount_lists.school_subsidy) as school_subsidy,
+                // SUM(student_discount_lists.employee_scholar) as employee_scholar,
+                // SUM(student_discount_lists.gov_subsidy) as gov_subsidy,
+                // SUM(student_discount_lists.acad_scholar) as acad_scholar,
+                // SUM(student_discount_lists.family_member) as family_member,
+                // SUM(student_discount_lists.nbi_alumni) as nbi_alumni,
+                // SUM(student_discount_lists.cash_discount) as cash_discount,
+                // SUM(student_discount_lists.cwoir_discount) as cwoir_discount,
+                // SUM(student_discount_lists.st_joseph_discount) as st_joseph_discount
             ->first();
             
             $Student = Student::with([
