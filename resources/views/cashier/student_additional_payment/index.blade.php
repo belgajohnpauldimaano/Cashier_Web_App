@@ -70,7 +70,7 @@
                 <form action="{{ route('cashier.student_additional_payment.student_additional_fee_report') }}" method="POST" id="form_student_additional_fee_report">
                     {{csrf_field()}}
                     <input type="hidden" name="pdf_search_filter">
-                    <input type="hidden" name="pdf_filter_grade"> 
+                    <input type="hidden" name="pdf_filter_grade" value="1"> 
                     <input type="hidden" name="pdf_filter_section">   
                 </form>
                 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
