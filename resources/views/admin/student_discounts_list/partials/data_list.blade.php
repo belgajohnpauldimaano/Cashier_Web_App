@@ -53,6 +53,7 @@
                                     @elseif ($selected_discount_types == 9)
                                         {{ a_number_format($student->cwoir_discount) }}
                                     @endif
+                                    {{$student->tuition_fee}}
                                 </td>
                                 {{--  <td>
                                     <div class="input-group-btn">

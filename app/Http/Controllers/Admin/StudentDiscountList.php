@@ -16,13 +16,20 @@ class StudentDiscountList extends Controller
     {
         $SchoolYear = SchoolYear::first();
         $Students  = StudentSchoolYearTag::join('students', 'students.id', '=', 'student_school_year_tags.student_id')
-        ->join('student_discount_lists', 'student_discount_lists.student_id', '=', 'student_school_year_tags.student_id')
+        ->join('student_discount_lists', function ($join) use ($SchoolYear) {
+            $join->on('student_discount_lists.student_id', '=', 'student_school_year_tags.student_id')
+            ->where('student_discount_lists.school_year_id', $SchoolYear->id);
+        })
         ->join('grades', 'grades.id', '=', 'student_school_year_tags.grade_id')
         ->join('sections', 'sections.id', '=', 'student_school_year_tags.section_id')
-        ->join('tuition_fees', 'tuition_fees.grade_id', '=', 'student_school_year_tags.grade_id')
+        ->join('tuition_fees', function ($join) use ($SchoolYear) {
+            $join->on('tuition_fees.grade_id', '=', 'student_school_year_tags.grade_id')
+            ->where('student_discount_lists.school_year_id', $SchoolYear->id);
+        })
+        // ->join('tuition_fees', 'tuition_fees.grade_id', '=', 'student_school_year_tags.grade_id')
         ->where('student_school_year_tags.school_year_id', $SchoolYear->id)
         ->where('tuition_fees.school_year_id', $SchoolYear->id)
-        ->where('student_discount_lists.school_year_id', $SchoolYear->id)
+        ->where('student_discount_lists.school_year_id',  $SchoolYear->id)
         ->selectRaw('
             student_school_year_tags.student_id,
             student_school_year_tags.grade_id,
@@ -77,10 +84,18 @@ class StudentDiscountList extends Controller
             $pages = $request->show_count;
         }
         $Students  = StudentSchoolYearTag::join('students', 'students.id', '=', 'student_school_year_tags.student_id')
-        ->join('student_discount_lists', 'student_discount_lists.student_id', '=', 'student_school_year_tags.student_id')
+        // ->join('student_discount_lists', 'student_discount_lists.student_id', '=', 'student_school_year_tags.student_id')
+        ->join('student_discount_lists', function ($join) use ($request) {
+            $join->on('student_discount_lists.student_id', '=', 'student_school_year_tags.student_id')
+            ->where('student_discount_lists.school_year_id', $request->filter_school_year);
+        })
         ->join('grades', 'grades.id', '=', 'student_school_year_tags.grade_id')
         ->join('sections', 'sections.id', '=', 'student_school_year_tags.section_id')
-        ->join('tuition_fees', 'tuition_fees.grade_id', '=', 'student_school_year_tags.grade_id')
+        // ->join('tuition_fees', 'tuition_fees.grade_id', '=', 'student_school_year_tags.grade_id')
+        ->join('tuition_fees', function ($join) use ($request) {
+            $join->on('tuition_fees.grade_id', '=', 'student_school_year_tags.grade_id')
+            ->where('student_discount_lists.school_year_id', $request->filter_school_year);
+        })
         ->where(function ($query) use ($request) {
             $query->whereRaw("concat(students.first_name, ' ', students.middle_name , ' ', students.last_name) like '%". $request->search_filter ."%' ");
             if ($request->filter_grade)
