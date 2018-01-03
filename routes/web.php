@@ -61,7 +61,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('deactivate-student', 'Admin\SchoolYearController@deactivate_student')->name('admin.student_tagged_school_year.deactivate_student');
         
     });
-    
+
+    Route::group(['prefix' => 'student-discount-list'], function () {
+        Route::get('', 'Admin\StudentDiscountList@index')->name('admin.student_discount_list.index');
+        Route::post('list-data', 'Admin\StudentDiscountList@list_data')->name('admin.student_discount_list.list_data');
+        
+    });
 });
 
         Route::get('test_data', 'Admin\StudentController@test_data')->name('admin.manage_student.test_data');
