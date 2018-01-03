@@ -20,6 +20,7 @@ class CreateTuitionFeesTable extends Migration
             $table->decimal('misc_fee', 12, 2);
             $table->decimal('upon_enrollment', 12, 2)->default('0.00');
             $table->string('school_year', 20);
+            $table->integer('school_year_id')->unsigned();
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
         });

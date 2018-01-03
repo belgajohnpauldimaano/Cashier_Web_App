@@ -3,6 +3,7 @@
     <input type="hidden" name="pdf_search_filter" value="{{ $request['search_filter'] }}">
     <input type="hidden" name="pdf_filter_grade" value="{{ $request['filter_grade'] }}"> 
     <input type="hidden" name="pdf_filter_section" value="{{ $request['filter_section'] }}">   
+    <input type="hidden" name="pdf_school_year" value="{{ $request['filter_school_year'] }}">    
 </form>
 
 
@@ -10,7 +11,8 @@
     {{csrf_field()}}
     <input type="hidden" name="pdf_search_filter" value="{{ $request['search_filter'] }}">
     <input type="hidden" name="pdf_filter_grade" value="{{ $request['filter_grade'] }}"> 
-    <input type="hidden" name="pdf_filter_section" value="{{ $request['filter_section'] }}">   
+    <input type="hidden" name="pdf_filter_section" value="{{ $request['filter_section'] }}"> 
+    <input type="hidden" name="pdf_school_year" value="{{ $request['filter_school_year'] }}">   
 </form>
 
 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
@@ -24,6 +26,7 @@
                         <th>Section</th>
                         <th>Tuition</th>
                         <th>Discount</th>
+                        <th>Gov't Subsidy</th>
                         <th>Net Tuition</th>
                         <th>Paid Tuition</th>
                         <th>Outstanding Balance</th>
@@ -60,10 +63,14 @@
                                     $outstanding_balance = 0;
                                 }
 
+                                if ($student->status == 0)
+                                {
+                                    $outstanding_balance = 0;
+                                }
                             ?>
                             <tr>
                                 <td>
-                                    {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
+                                    {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
                                 </td>
                                 <td>
                                     @if ($student->grade)
@@ -84,6 +91,11 @@
                                     @if ($student->discount_list)
                                         {{ a_number_format($discount) }}
                                     @endif
+                                </td>
+                                <td>
+                                    @if ($student->grade_tuition)
+                                        {{ a_number_format($student->tuition[0]->gov_subsidy) }}
+                                    @endif       
                                 </td>
                                 <td>
                                     @if ($student->discount_list)
@@ -113,10 +125,14 @@
                                          {{ a_number_format( $student->tuition[0]->additional_fee_total) }} 
                                 </td>   --}}
                                 <td>
-                                    @if ($outstanding_balance > 0) 
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay_tuition" data-id="{{ $student->id }}">Pay</button>    
+                                    @if ($student->status == 0)
+                                        <span class="text-red">Inactive</span>
                                     @else
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay_tuition" data-id="{{ $student->id }}">View (Paid)</button>    
+                                        @if ($outstanding_balance > 0) 
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay_tuition" data-id="{{ $student->student_info->id }}">Pay</button>    
+                                        @else
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay_tuition" data-id="{{ $student->student_info->id }}">View (Paid)</button>    
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

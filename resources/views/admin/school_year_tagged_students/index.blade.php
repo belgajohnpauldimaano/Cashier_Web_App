@@ -1,23 +1,24 @@
 @extends('layouts.main')
 
-@section('content_title', 'Manage Fees')
+@section('content_title')
+    Tagged Students ({{ $SchoolYear->school_year }})
+@endsection
 
 @section ('content')
-
     <div class="clearfix margin"></div>
     <div class="box box-solid">
         <div class="box-body">
             
-             <div class="filters">
+            <div class="filters">
                 <form action="" id="search">
                     {{ csrf_field() }}
                     <div class="row">
-                        {{--  <div class="col-sm-12 col-md-3 col-lg-3"> 
+                            <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
                                 <label for="">Search</label>
                                 <input type="text" id="search_filter" name="search_filter" class="form-control js-search_filters">
                             </div>
-                        </div>  --}}
+                        </div>
                         <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
                                 <label for="">Grade</label>
@@ -31,7 +32,7 @@
                                 </select>
                             </div>
                         </div>
-                        {{--  <div class="col-sm-12 col-md-3 col-lg-3"> 
+                        <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
                                 <label for="">Section</label>
                                 <select name="filter_section" id="filter_section" class="form-control js-search_filters">
@@ -49,54 +50,45 @@
                                 <label for="">Show Entries</label>
                                 <select name="show_count" id="show_count" class="form-control js-search_filters">
                                     <option value="">All</option>
-                                    <option value="1" selected="selected">1</option>
-                                    <option value="2">2</option>
-                                    <option value="10">10</option>
+                                    <option value="10" selected="selected">10</option>
                                     <option value="20">20</option>
                                     <option value="30">30</option>
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select>
                             </div>
-                        </div>  --}}
+                        </div>
                     </div>
                 </form>
-            </div> 
+            </div>
 
             <div class="js-content_holder box box-solid">
                 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
+                <div class="pull-right">
+                    {{ $Students->links('admin.manage_student.partials.student_data_list_pagination') }}
+                </div>
                 <table class="table table-bordered">
                     <tr>
+                        <th>Name</th>
                         <th>Grade</th>
-                        <th>Tuition Fee</th>
-                        <th>Miscallenous Fee</th>
-                        <th>Other Fees</th>
+                        <th>Section</th>
                         <th>Actions</th>
                     </tr>
                     <tbody>
-                        @foreach ($Grade_Tuition as $data)
+                        @foreach ($Students as $student)
                             <tr>
                                 <td>
-                                    {{ $data->grade }}
+                                    {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
                                 </td>
                                 <td>
-                                    @if (count($data->tuition_fee) > 0)
-                                        &#8369; {{ a_number_format($data->tuition_fee[0]->tuition_fee) }}
+                                    @if ($student->grade)
+                                        {{ $student->grade->grade }}
                                     @endif
                                 </td>
                                 <td>
-                                    @if (count($data->tuition_fee) > 0)
-                                        &#8369; {{ a_number_format($data->tuition_fee[0]->misc_fee) }}
+                                    @if ($student->section)
+                                        {{ $student->section->section_name }}
                                     @endif
-                                </td>
-                                <td>
-                                    <?php $additional_fee = 0; ?>
-                                    @if (count($data->tuition_fee) > 0)
-                                        @foreach ($data->additional_fee as $add_fee)
-                                            <?php $additional_fee += $add_fee->additional_amount; ?>
-                                        @endforeach
-                                    @endif
-                                    &#8369; {{ a_number_format($additional_fee) }}
                                 </td>
                                 <td>
                                     <div class="input-group-btn">
@@ -104,8 +96,8 @@
                                             <span class="fa fa-bars"></span>
                                         </button>
                                         <ul class="dropdown-menu">
-                                             <li><a href="#" class="js-edit_fees" data-id="{{ $data->id }}"><i class="fa fa-pencil"></i>Edit</a></li> 
-                                            {{--  <li><a href="#" class="js-delete_student_info" data-id="{{ $student->id }}"><i class="fa fa-trash"></i>Delete</a></li>  --}}
+                                            <li><a href="#" class="js-edit_student_info" data-id="{{ $student->id }}"><i class="fa fa-pencil"></i>Edit</a></li>
+                                            <li><a href="#" class="js-delete_student_info" data-id="{{ $student->id }}"><i class="fa fa-trash"></i>Deactivate</a></li>
                                         </ul>
                                     </div>
                                 </td>
@@ -126,8 +118,7 @@
             show_form_modal({
                 url         : "{{ route('admin.manage_student.form_modal') }}",
                 reqData     : {
-                                _token  : '{{ csrf_token() }}', 
-                                sy_id   : sy_id
+                                _token  : '{{ csrf_token() }}'
                             },
                 target      : $('.js-form_modal_holder'),
                 func        : {}
@@ -135,7 +126,7 @@
 
         });
 
-        $('body').on('click', '.js-edit_fees', function (e) {
+        $('body').on('click', '.js-edit_student_info', function (e) {
             e.preventDefault();
             var id = $(this).data('id');
             if (id == '')
@@ -143,10 +134,10 @@
                 return;
             }
             show_form_modal({
-                url         : "{{ route('admin.manage_fees.form_modal') }}",
+                url         : "{{ route('admin.student_tagged_school_year.form_modal') }}",
                 reqData     : {
                                 _token  : '{{ csrf_token() }}',
-                                id      : id, 
+                                id      : id,
                                 sy_id   : sy_id
                             },
                 target      : $('.js-form_modal_holder'),
@@ -165,9 +156,9 @@
             
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
-            
+            formData.append('sy_id', sy_id);
             delete_data({
-                url         : "{{ route('admin.manage_student.delete') }}",
+                url         : "{{ route('admin.student_tagged_school_year.deactivate_student') }}",
                 reqData     : {
                                 _token  : '{{ csrf_token() }}',
                                 id      : id
@@ -176,7 +167,7 @@
                 fetch_data : {
                     func    : fetch_data,
                     params  : {
-                        url         : "{{ route('admin.manage_fees.list') }}",
+                        url         : "{{ route('admin.student_tagged_school_year.student_school_year_tagged_list_data') }}",
                         formData    : formData,
                         target      : $('.js-content_holder')
                     }
@@ -187,29 +178,26 @@
         
         
 
-        $('body').on('submit', '#form_manage_fees', function (e) {
+        $('body').on('submit', '#form_student', function (e) {
             e.preventDefault();
             
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
             formData.append('sy_id', sy_id);
             
-            
             save_data({
-                url : "{{ route('admin.manage_fees.save_data') }}",
+                url : "{{ route('admin.student_tagged_school_year.save_data_student') }}",
                 form : $(this),
                 fetch_data : {
                     func    : fetch_data,
                     params  : {
-                        url         : "{{ route('admin.manage_fees.list') }}",
+                        url         : "{{ route('admin.student_tagged_school_year.student_school_year_tagged_list_data') }}",
                         formData    : formData,
                         target      : $('.js-content_holder')
                     }
                 }
             });
         });
-
-
         $('body').on('submit', '#search', function (e) {
             e.preventDefault();
         });
@@ -218,7 +206,7 @@
             formData.append('page', 1);
             formData.append('sy_id', sy_id);
             fetch_data({
-                url         : "{{ route('admin.manage_fees.list') }}",
+                url         : "{{ route('admin.student_tagged_school_year.student_school_year_tagged_list_data') }}",
                 formData    : formData,
                 target      : $('.js-content_holder')
             });
@@ -231,12 +219,48 @@
             formData.append('page', page);
             formData.append('sy_id', sy_id);
             fetch_data({
-                url         : "{{ route('admin.manage_fees.list') }}",
+                url         : "{{ route('admin.student_tagged_school_year.student_school_year_tagged_list_data') }}",
                 formData    : formData,
                 target      : $('.js-content_holder')
             });
         });
 
+        
+        $('body').on('click', '.js-tag_school_year', function (e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+            show_form_modal({
+                url         : "{{ route('admin.manage_student.tag_student_school_year') }}",
+                reqData     : {
+                                _token  : '{{ csrf_token() }}',
+                                id      : id
+                            },
+                target      : $('.js-form_modal_holder'),
+                func        : {}
+            });
+            
+        });
+        
+        $('body').on('submit', '#form_student_tag_school_yer', function (e) {
+            e.preventDefault();
+            
+            var formData = new FormData($('#search')[0]);
+            formData.append('page', 1);
+            formData.append('sy_id', sy_id);
+            
+            save_data({
+                url : "{{ route('admin.manage_student.save_tag_student_school_year') }}",
+                form : $(this),
+                fetch_data : {
+                    func    : fetch_data,
+                    params  : {
+                        url         : "{{ route('admin.student_tagged_school_year.student_school_year_tagged_list_data') }}",
+                        formData    : formData,
+                        target      : $('.js-content_holder')
+                    }
+                }
+            });
+        });
         /*function show_form_modal (data)
         {
             alert('a');

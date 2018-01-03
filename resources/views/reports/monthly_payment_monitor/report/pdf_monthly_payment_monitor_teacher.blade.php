@@ -125,7 +125,7 @@
             ?>
             <tr>
                 <td>
-                    <small>{{ $student->last_name . ', ' . $student->first_name . ' ' . $student->middle_name }}</small>
+                    <small>{{ $student->student_info->last_name . ', ' . $student->student_info->first_name . ' ' . $student->student_info->middle_name }}</small>
                 </td>
                 <td>
                     @if ($student)
@@ -150,7 +150,7 @@
                 @else
                     @for($i=0;$i<10;$i++)
                         <td >
-                            @if ($outstanding_balance == 0)
+                            @if ($outstanding_balance <= 0)
                                     <span class="text-green">PAID</span>
                             @else
                                 @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)

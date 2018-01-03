@@ -5,6 +5,7 @@
     <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
     <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
+    <input type="hidden" name="report_filter_school_year" value="{{ $request['filter_school_year'] }}"> 
 </form>
 <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_summary_monitor') }}" id="form_monthly_payment_summary_monitor_report" method="POST">
     {{ csrf_field() }}   
@@ -13,6 +14,7 @@
     <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
     <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
+    <input type="hidden" name="report_filter_school_year" value="{{ $request['filter_school_year'] }}"> 
 </form>
 
 <form action="{{ route('reports.monthly_payment_monitor.export_pdf_monthly_payment_monitor_teacher') }}" id="form_monthly_payment_summary_monitor_teacher_report" method="POST">
@@ -22,6 +24,7 @@
     <input type="hidden" id="report_filter_section" name="report_filter_section" value="{{ $request['filter_section'] }}">
     <input type="hidden" id="report_filter_month" name="report_filter_month" value="{{ $request['filter_month'] }}">
     <input type="hidden" id="report_filter_month_to" name="report_filter_month_to" value="{{ $request['filter_month_to'] }}">
+    <input type="hidden" name="report_filter_school_year" value="{{ $request['filter_school_year'] }}"> 
 </form>
 
 <div class="pull-right">
@@ -92,10 +95,15 @@
 
                 $total_monthly_payment = 0;
                 $total_monthly_amount = 0;
+                $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
+                if ($outstanding_balance <= 0)
+                {
+                    $outstanding_balance = 0;
+                }
             ?>
             <tr>
                 <td>
-                    <small>{{ $student->last_name . ', ' . $student->first_name . ' ' . $student->middle_name }}</small>
+                    <small>{{ $student->student_info->last_name . ', ' . $student->student_info->first_name . ' ' . $student->student_info->middle_name }}</small>
                 </td>
                 <td>
                     @if ($student)
@@ -161,8 +169,15 @@
                 @endif
                 <td>
                     <span class="text-red">
-                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment)) }} 
+                        {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment)) }}   --}}
                         {{--  {{ $total_monthly_amount . ' ' . $total_monthly_payment }} {{ $left_unpaid_down }}  --}}
+                        
+                        @if ($student->status == 1)
+                            {{ $outstanding_balance }}
+                            {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment)) }}   --}}
+                        @else
+                            <span class="text-red">Inactive</span>
+                        @endif
                     </span>
                 </td>
             </tr>

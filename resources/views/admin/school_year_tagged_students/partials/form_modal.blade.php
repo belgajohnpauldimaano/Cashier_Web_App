@@ -14,7 +14,9 @@
                         @if($Student)
                             <input type="hidden" name="id" value="{{ $Student->id }}">
                         @endif
-                    <div class="form-group">
+                        <input type="hidden" name="sy_id" value="{{ $sy_id }}">
+                        <input type="hidden" name="student_id" value="{{ $Student->student_id }}">
+                    {{--  <div class="form-group">
                         <label for="">First Name <span class="text-red">*</span></label>
                         <input type="text" class="form-control" name="first_name" id="first_name" value="{{ ($Student ? $Student->first_name : '' ) }}">
                         <div class="help-block text-center" id="first_name-error"></div>
@@ -28,9 +30,9 @@
                         <label for="">Last Name <span class="text-red">*</span></label>
                         <input type="text" class="form-control" name="last_name" id="last_name" value="{{ ($Student ? $Student->last_name : '' ) }}">
                         <div class="help-block text-center" id="last_name-error"></div>
-                    </div>
+                    </div>  --}}
                     
-                    {{--  <div class="form-group">
+                    <div class="form-group">
                         <label for="">Grade <span class="text-red">*</span></label>
                         <select class="form-control"  name="grade" id="grade">
                             <option value="">Select Grade</option>
@@ -54,15 +56,15 @@
                             @endif
                         </select>
                         <div class="help-block text-center" id="section-error"></div>
-                    </div>  --}}
+                    </div>
 
                     {{--  @foreach ($Discount as $data)
                         <div class="checkbox">
-                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>  --}}
-                            {{--  <input type="text" name="discounts_id[]" value="{{ $data->id }}">  --}}
-                        {{--  </div>
+                            <label><input type="checkbox" name="discounts[{{ $data->id }}]" > {{ $data->discount_title }} </label>
+                             <input type="text" name="discounts_id[]" value="{{ $data->id }}">
+                        </div>
                     @endforeach  --}}
-                    {{--  <table class="table table-bordered table-striped">
+                     <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th class="text-center" colspan="2">Discounts</th>
@@ -94,12 +96,12 @@
                                     </select>
                                 </td>
                             </tr>
-                            <tr>
+                            {{--  <tr>
                                 <td title="Gov't Subsidy - SV & PEAC-FAPE">Gov't Subsidy</td>
                                 <td>
                                     <input type="number" name="gov_subsidy" id="gov_subsidy" class="form-control" value="{{ ( $Student ? ($Student->discount_list ? $Student->discount_list->gov_subsidy  : '') : '') }}" />
                                 </td>
-                            </tr>
+                            </tr>  --}}
                             <tr>
                                 <td>Academic Scholarship</td>
                                 <td>
@@ -157,8 +159,14 @@
                                     <input type="number" name="st_jospeh_discount" id="st_jospeh_discount" class="form-control" value="{{ ( $Student ? ($Student->discount_list ? $Student->discount_list->st_joseph_discount  : '') : '') }}" />
                                 </td>
                             </tr>
+                            <tr>
+                                <td>Book Remarks</td>
+                                <td>
+                                    <input type="number" step="any" name="book_remarks" id="book_remarks" class="form-control" value="{{ ( $AdditionalFeePayment ? $AdditionalFeePayment->book_remarks : '0') }}" />
+                                </td>
+                            </tr>
                         </tbody>
-                    </table>  --}}
+                    </table> 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">Cancel</button>

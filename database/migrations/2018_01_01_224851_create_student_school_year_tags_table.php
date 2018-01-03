@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAdditionalFeesTable extends Migration
+class CreateStudentSchoolYearTagsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,11 @@ class CreateAdditionalFeesTable extends Migration
      */
     public function up()
     {
-        Schema::create('additional_fees', function (Blueprint $table) {
+        Schema::create('student_school_year_tags', function (Blueprint $table) {
             $table->increments('id');
+            $table->integer('student_id')->unsigned();
             $table->integer('grade_id')->unsigned();
-            $table->string('additional_title', 190);
-            $table->decimal('additional_amount', 12, 2);
-            $table->tinyInteger('discount_percentage')->default('1');
-            $table->string('school_year', 20);
+            $table->integer('section_id')->unsigned();
             $table->integer('school_year_id')->unsigned();
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
@@ -33,6 +31,6 @@ class CreateAdditionalFeesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('additional_fees');
+        Schema::dropIfExists('student_school_year_tags');
     }
 }

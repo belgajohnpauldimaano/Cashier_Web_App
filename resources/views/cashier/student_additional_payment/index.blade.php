@@ -49,6 +49,21 @@
                                 </select>
                             </div>
                         </div>
+
+                        <div class="col-sm-12 col-md-3 col-lg-3"> 
+                            <div class="form-group">
+                                <label for="">School Year</label>
+                                <select name="filter_school_year" id="filter_school_year" class="form-control js-search_filters">
+                                    {{--  <option value="">All</option>  --}}
+                                    @if($SchoolYear)
+                                        @foreach ($SchoolYear as $data)
+                                            <option value="{{ $data->id }}">{{ $data->school_year }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="col-sm-12 col-md-3 col-lg-3 pull-right"> 
                             <div class="form-group">
                                 <label for="">Show Entries</label>
@@ -72,6 +87,7 @@
                     <input type="hidden" name="pdf_search_filter">
                     <input type="hidden" name="pdf_filter_grade" value="1"> 
                     <input type="hidden" name="pdf_filter_section">   
+                    <input type="hidden" name="pdf_filter_school_year" value="{{ ($SchoolYear ? $SchoolYear[0]->id : '') }}"> 
                 </form>
                 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
                 <div class="pull-right">
@@ -116,10 +132,16 @@
                                 }
 
                                 $outstanding_balance = $total_additional_fee - $total_additional_payment;
+                                
+                                if ($student->status == 0)
+                                {
+                                    $outstanding_balance = 0;
+                                }
                             ?>
                             <tr>
                                 <td>
-                                    {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
+                                    {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
+                                    {{--  {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}  --}}
                                 </td>
                                 <td>
                                     @if ($student->grade)
@@ -134,7 +156,7 @@
                                 <td>
                                     @if ($student->additional_fee_payment)
                                         <span class="{{ $individual_fee[0] > $student->additional_fee_payment->books ? 'text-red' : 'text-green'}}">
-                                            {{ a_number_format($student->additional_fee_payment->books) }}
+                                            {{ a_number_format($student->additional_fee_payment->books - $student->additional_fee_payment->book_remarks) }}
                                         </span>
                                     @endif
                                 </td>
@@ -169,10 +191,14 @@
                                    <strong class="text-blue">{{ a_number_format($outstanding_balance) }}</strong>
                                 </td>
                                 <td>
-                                    @if ($outstanding_balance > 0) 
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->id }}">Pay</button>    
+                                    @if ($student->status == 0)
+                                        <span class="text-red">Inactive</span>
                                     @else
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->id }}">View (Paid)</button>    
+                                        @if ($outstanding_balance > 0) 
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->student_info->id }}">Pay</button>    
+                                        @else
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->student_info->id }}">View (Paid)</button>    
+                                        @endif
                                     @endif
                                 </td>
                             </tr>
@@ -202,7 +228,8 @@
                 url     : "{{ route('cashier.student_additional_payment.form_modal_additional_payment') }}",
                 reqData : {
                             _token  : '{{ csrf_token() }}',
-                            id      : id
+                            id      : id,
+                            filter_school_year : $('#filter_school_year').val()
                 },
                 target  : $('.js-form_modal_holder')
             });
@@ -332,10 +359,10 @@
             });
         }
 
-        $('body').on('show.bs.modal', '#form_additional_payment_modal', function () {
+        $('body').on('shown.bs.modal', '#form_additional_payment_modal', function () {
             $('#date_received').datepicker({
                 Default: new Date(),
-                format: 'yyyy-mm-dd'
+                format: 'mm-dd-yyyy'
             }).datepicker("setDate", new Date());;
         });
     </script>

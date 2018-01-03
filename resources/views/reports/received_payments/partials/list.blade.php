@@ -6,6 +6,7 @@
     <input type="hidden" id="filter_start_date" name="filter_start_date" value="{{ $request['filter_start_date'] }}">
     <input type="hidden" id="filter_end_date" name="filter_end_date" value="{{ $request['filter_end_date'] }}">
     <input type="hidden" id="report_payment_type" name="report_payment_type" value="{{ $request['payment_type'] }}">
+    <input type="hidden" name="report_school_year" value="{{ $request['filter_school_year'] }}"> 
     
 </form>
 <form action="{{ route('reports.receivedpayments.received_payments_summary_report') }}" id="form_received_payments_search_summary_report" method="POST">
@@ -16,6 +17,7 @@
     <input type="hidden" id="filter_start_date" name="filter_start_date" value="{{ $request['filter_start_date'] }}">
     <input type="hidden" id="filter_end_date" name="filter_end_date" value="{{ $request['filter_end_date'] }}">
     <input type="hidden" id="report_payment_type" name="report_payment_type" value="{{ $request['payment_type'] }}">
+    <input type="hidden" name="report_school_year" value="{{ $request['filter_school_year'] }}"> 
     
 </form>
 
@@ -45,7 +47,7 @@
         <th>Date Received</th>
         <th>Received by</th>
         <th>Date Created</th>
-        {{--  <th>Actions</th>  --}}
+        <th>Actions</th>
     </tr>
     <tbody>
         @foreach ($StudentPaymentLog as $data)
@@ -54,7 +56,7 @@
                     {{ $data->student->last_name . ' ' . $data->student->first_name . ' ' . $data->student->middle_name }}
                 </td>
                 <td>
-                    {{ $data->student->grade->grade . ' / ' . $data->student->section->section_name }}
+                    {{ $data->student->student_school_year_tag->grade->grade . ' / ' . $data->student->student_school_year_tag->section->section_name }}
                 </td>
                 <td>
                     @if ($data->payment_type == 1)
@@ -68,9 +70,9 @@
                 </td>
                 <td>
                     <span class="">{{ $data->or_number }}</span>
-                </td>
+                </td>   
                 <td>
-                    {{ \Carbon\Carbon::parse($data->received_date, 'Asia/Manila')->format('F d, Y') }}
+                    {{ \Carbon\Carbon::parse($data->received_date)->format('F d, Y') }}
                 </td>
                 <td>
                     @if ($data->user)
@@ -82,10 +84,20 @@
                 <td>
                     {{ \Carbon\Carbon::parse($data->created_at, 'Asia/Manila')->format('F d, Y') }}
                 </td>
-                {{--  <td>
-                    <button class="btn btn-flat btn-primary btn-sm">Edit Amount</button>
-                </td>  --}}
-            </tr>
+                <td>
+                    <div class="input-group-btn  pull-left">
+                        <button type="button" class="btn btn-default btn-default dropdown-toggle" data-toggle="dropdown">
+                            <span class="fa fa-bars"></span>
+                        </button>
+                        <ul class="dropdown-menu text-right">
+                            <li class=""><a href="#" class="js-edit_entry" data-id="{{ $data->id }}"><i class="fa fa-pencil"></i>Edit</a></li>
+                            <li class=""><a href="#" class="js-delete_entry" data-id="{{ $data->id }}"><i class="fa fa-trash"></i>Delete</a></li>
+                            {{--  <li><a href="{{ route('admin.manage_fees.index', $data->id) }}"><i class="fa fa-pencil"></i>Manage Fees</a></li>  --}}
+                            {{--  <li><a href="#" class="js-delete_discount_info" data-id="{{ $data->id }}"><i class="fa fa-trash"></i>Delete</a></li>  --}}
+                        </ul>
+                    </div>
+                    {{--  <button class="btn btn-flat btn-primary btn-sm js-edit_entry" data-id="{{ $data->id }}">Edit Entry</button>  --}}
+                </td>
         @endforeach
     </tbody>
 </table>

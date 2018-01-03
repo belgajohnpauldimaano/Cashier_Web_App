@@ -13,7 +13,9 @@
                     <div class="modal-body">
                         @if($total_additional_payment < $total_additional_fee)
                             {{ csrf_field() }}
-                            <input type="hidden" name="id" value="{{ $Student->id }}"> 
+                            
+                            <input type="hidden" name="id" value="{{ $Student->student_info->id }}"> 
+                            <input type="hidden" name="sy_id" value="{{ $sy_id }}"> 
                             <div class="form-group">
                                 <label for="">Balance</label>
                                 <h3 class="text-red">
@@ -22,7 +24,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="">Payment <span class="text-red"></span></label>
-                                <input type="number" class="form-control" name="payment" id="payment" min="1">
+                                <input type="number" step="any" class="form-control" name="payment" id="payment" min="1">
                                 <div class="help-block text-center" id="payment-error"></div>
                             </div>
                             <div class="form-group">

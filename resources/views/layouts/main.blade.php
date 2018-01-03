@@ -158,7 +158,9 @@
         </li>  --}}
         @if (Auth::user()->role == 1)
           <li class="film"><a href="{{ route('admin.manage_student.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Students</span></a></li>
-          <li class="film"><a href="{{ route('admin.manage_fees.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Fees</span></a></li>
+          {{--  <li class="film"><a href="{{ route('admin.manage_fees.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Fees</span></a></li>  --}}
+          <li class="film"><a href="{{ route('admin.manage_school_years.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage School Years</span></a></li>
+          
           {{--  <li class="film"><a href="{{ route('admin.manage_discounts.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Manage Discounts</span></a></li>  --}}
         @elseif (Auth::user()->role == 2)
             <li class="film"><a href="{{ route('cashier.student_payment.index') }}"><i class="fa fa-circle-o text-yellow"></i> <span>Student Payment</span></a></li>

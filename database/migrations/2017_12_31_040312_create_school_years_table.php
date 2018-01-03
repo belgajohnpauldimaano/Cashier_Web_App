@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateStudentDiscountsTable extends Migration
+class CreateSchoolYearsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateStudentDiscountsTable extends Migration
      */
     public function up()
     {
-        Schema::create('student_discounts', function (Blueprint $table) {
+        Schema::create('school_years', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('student_id')->unsigned();
-            $table->integer('discount_id')->unsigned();
-            $table->integer('created_by')->unsigned();
-            $table->string('school_year', 20);
-            $table->integer('school_year_id')->unsigned();
+            $table->string('school_year', 30);
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
         });
@@ -32,6 +28,6 @@ class CreateStudentDiscountsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('student_discounts');
+        Schema::dropIfExists('school_years');
     }
 }

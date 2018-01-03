@@ -158,10 +158,16 @@
                 $month_total['m8'] += $student->tuition[0][$month_field[7]];
                 $month_total['m9'] += $student->tuition[0][$month_field[8]];
                 $month_total['m10'] += $student->tuition[0][$month_field[9]];
+                
+                $outstanding_balance = $net_tuition - $student->tuition[0]->total_payment;
+                if ($outstanding_balance <= 0)
+                {
+                    $outstanding_balance = 0;
+                }
             ?>
             <tr>
                 <td>
-                    <small>{{ $student->last_name . ', ' . $student->first_name . ' ' . $student->middle_name }}</small>
+                    <small>{{ $student->student_info->last_name . ', ' . $student->student_info->first_name . ' ' . $student->student_info->middle_name }}</small>
                 </td>
                 <td>
                     @if ($student)
@@ -226,12 +232,16 @@
                 @endif
                 <td class="text-right">
                     <span class="text-red">
-                        {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}  --}}
-                        {{ a_number_format(($total_monthly_amount - $total_monthly_payment)) }}
-                        <?php 
-                            $total_receivables = $total_receivables + (($total_monthly_amount - $total_monthly_payment));
-                            
-                        ?>
+                        @if ($student->status == 1)
+                            {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment) + $left_unpaid_down) }}  --}}
+                            {{ a_number_format($outstanding_balance) }}
+                            {{--  {{ a_number_format(($total_monthly_amount - $total_monthly_payment)) }}  --}}
+                            <?php 
+                                $total_receivables += $outstanding_balance;
+                            ?>
+                        @else
+                            <span>Inactive</span>
+                        @endif
                     </span>
                 </td>
             </tr>
@@ -250,6 +260,7 @@
                     <td class="text-right">{{ a_number_format($month_total[$month_field[$i]]) }}</td>
                 @endfor
             @endif
+            {{--  <td class="text-right">{{ a_number_format($outstanding_balance) }}</td>  --}}
             <td class="text-right">{{ a_number_format($total_receivables) }}</td>
             
         </tr>

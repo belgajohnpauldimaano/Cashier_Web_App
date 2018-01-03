@@ -11,40 +11,89 @@ use App\Student;
 use App\Grade;
 use App\Section;
 use App\StudentTuitionFee;
+use App\SchoolYear;
+use App\StudentSchoolYearTag;
 
 class MonthlyPaymentMonitorController extends Controller
 {
     public function index ()
     {
-        $StudentTuitionFee = StudentTuitionFee::with(['student'])->paginate(10);
+        $SchoolYear = SchoolYear::first(); 
+        $sy_id = '';
+        if ($SchoolYear)
+        {
+            $sy_id = $SchoolYear->id;
+        }
+        $StudentTuitionFee = StudentTuitionFee::with(['student'])->where('school_year_id', $sy_id)->paginate(10);
 
         $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
         $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
         
         
-        $Student = Student::with([
-                                    'grade', 
-                                    'section', 
-                                    'tuition' => function ($query) use ($select_columns) {
-                                        $query->selectRaw($select_columns);
-                                        $query->where('status', 1);
-                                    },
-                                    'grade.tuition_fee' => function ($query) {
-                                        $query->where('status', 1);
-                                    },
-                                    'discount_list',
-                                    'grade_tuition',
-                                    'additional_fee'
-                                ])
-                                // ->where('grade_id', 1)
-                                // ->where('section_id', 1)
-                                ->where('status', 1)
-                                ->where(function ($query) {
-                                    // $query->where('section_id', 1);
-                                })
-                                ->orderBy('grade_id', 'ASC')
-                                ->paginate(10);
-
+        // $Student = Student::with([
+        //                             'grade', 
+        //                             'section', 
+        //                             'tuition' => function ($query) use ($select_columns, $sy_id) {
+        //                                 $query->selectRaw($select_columns);
+        //                                 $query->where('school_year_id', $sy_id);
+        //                                 $query->where('status', 1);
+        //                             },
+        //                             'grade.tuition_fee' => function ($query) use ($sy_id) {
+        //                                 $query->where('school_year_id', $sy_id);
+        //                                 $query->where('status', 1);
+        //                             },
+        //                             'discount_list',
+        //                             'grade_tuition',
+        //                             'additional_fee'
+        //                         ])
+        //                         // ->where('grade_id', 1)
+        //                         // ->where('section_id', 1)
+        //                         // ->where('status', 1)
+        //                         ->where(function ($query) {
+        //                             // $query->where('section_id', 1);
+        //                         })
+        //                         ->whereHas('tuition', function ($query) use ($sy_id) {
+        //                             $query->where('school_year_id', $sy_id);
+        //                         })
+        //                         ->orderBy('grade_id', 'ASC')
+        //                         ->paginate(10);
+                                
+        $Student = StudentSchoolYearTag::with([
+            'student_info',
+            'grade', 
+            'section', 
+            'tuition' => function ($query) use ($select_columns, $sy_id) {
+                $query->selectRaw($select_columns);
+                $query->where('school_year_id', $sy_id);
+                $query->where('status', 1);
+            },
+            'grade.tuition_fee' => function ($query) use ($sy_id) {
+                $query->where('school_year_id', $sy_id);
+                $query->where('status', 1);
+            },
+            'discount_list' => function ($query) use ($sy_id) {
+                $query->where('school_year_id', $sy_id);
+            },
+            'grade_tuition' => function ($query) use ($sy_id) {
+                $query->where('school_year_id', $sy_id);
+            },
+            'additional_fee' => function ($query) use ($sy_id) {
+                $query->where('school_year_id', $sy_id);
+            }
+        ])
+        // ->where('grade_id', 1)
+        // ->where('section_id', 1)
+        // ->where('status', 1)
+        ->where(function ($query) {
+            // $query->where('section_id', 1);
+        })
+        ->whereHas('tuition', function ($query) use ($sy_id) {
+            $query->where('school_year_id', $sy_id);
+        })
+        ->where('school_year_id', $sy_id)
+        ->orderBy('grade_id', 'ASC')
+        ->paginate(10);
+        // return json_encode($Student);
         $Grade = Grade::all();
         $Section = Section::where('grade_id', 1)->get();
                 
@@ -66,7 +115,8 @@ class MonthlyPaymentMonitorController extends Controller
             'm9',
             'm10',
         ];
-        return view('reports.monthly_payment_monitor.index', ['StudentTuitionFee' => $StudentTuitionFee, 'Grade' => $Grade, 'Section' => $Section, 'months_array' => $months_array, 'Students' => $Student, 'month_field' => $month_field]);
+        $SchoolYear = SchoolYear::all();
+        return view('reports.monthly_payment_monitor.index', ['StudentTuitionFee' => $StudentTuitionFee, 'Grade' => $Grade, 'Section' => $Section, 'months_array' => $months_array, 'Students' => $Student, 'month_field' => $month_field, 'SchoolYear' => $SchoolYear]);
     }
 
     public function list (Request $request)
@@ -93,36 +143,88 @@ class MonthlyPaymentMonitorController extends Controller
         //     }
         //     $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id '. $selected_months;
         // }
-        $Student = Student::with([
-                                'grade', 
-                                'section', 
-                                'tuition' => function ($query) use ($select_columns) {
-                                    $query->selectRaw($select_columns);
-                                    $query->where('status', 1);
-                                },
-                                'grade.tuition_fee' => function ($query) {
-                                    $query->where('status', 1);
-                                },
-                                'discount_list',
-                                'grade_tuition',
-                                'additional_fee'
-                                ])
-                                ->where(function ($query) use ($request) {
-                                    $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->search_filter ."%' ");
+        // $Student = Student::with([
+        //                         'grade', 
+        //                         'section', 
+        //                         'tuition' => function ($query) use ($select_columns, $request) {
+        //                             $query->selectRaw($select_columns);
+        //                             $query->where('school_year_id', $request->filter_school_year);
+        //                             $query->where('status', 1);
+        //                         },
+        //                         'grade.tuition_fee' => function ($query) use ($request) {
+        //                             $query->where('school_year_id', $request->filter_school_year);
+        //                             $query->where('status', 1);
+        //                         },
+        //                         'discount_list',
+        //                         'grade_tuition',
+        //                         'additional_fee'
+        //                         ])
+        //                         ->where(function ($query) use ($request) {
+        //                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->search_filter ."%' ");
                                                 
-                                    if ($request->filter_grade)
-                                    {
-                                        $query->where('grade_id', $request->filter_grade);
-                                    }
+        //                             if ($request->filter_grade)
+        //                             {
+        //                                 $query->where('grade_id', $request->filter_grade);
+        //                             }
 
-                                    if ($request->filter_section)
-                                    {
-                                        $query->where('section_id', $request->filter_section);
-                                    }
-                                })
-                                ->where('status', 1)
-                                ->orderBy('grade_id', 'ASC')
-                                ->paginate($pages);
+        //                             if ($request->filter_section)
+        //                             {
+        //                                 $query->where('section_id', $request->filter_section);
+        //                             }
+        //                         })
+        //                         // ->where('status', 1)
+        //                         ->whereHas('tuition', function ($query) use ($request) {
+        //                             $query->where('school_year_id', $request->filter_school_year);
+        //                         })
+        //                         ->orderBy('grade_id', 'ASC')
+        //                         ->paginate($pages);
+        $Student = StudentSchoolYearTag::with([
+            'student_info',
+            'grade', 
+            'section', 
+            'tuition' => function ($query) use ($select_columns, $request) {
+                $query->selectRaw($select_columns);
+                $query->where('school_year_id', $request->filter_school_year);
+                $query->where('status', 1);
+            },
+            'grade.tuition_fee' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->filter_school_year);
+                $query->where('status', 1);
+            },
+            'discount_list' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->filter_school_year);
+            },
+            'grade_tuition' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->filter_school_year);
+            },
+            'additional_fee' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->filter_school_year);
+            },
+            ])
+            ->where(function ($query) use ($request) {
+                // $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->search_filter ."%' ");
+                            
+                if ($request->filter_grade)
+                {
+                    $query->where('grade_id', $request->filter_grade);
+                }
+
+                if ($request->filter_section)
+                {
+                    $query->where('section_id', $request->filter_section);
+                }
+            })
+            // ->where('status', 1)
+            ->whereHas('tuition', function ($query) use ($request) {
+                $query->where('school_year_id', $request->filter_school_year);
+            })
+            ->whereHas('student_info', function ($query) use ($request) {
+                $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->search_filter ."%' ");
+            })
+            ->where('school_year_id', $request->filter_school_year)
+            ->orderBy('grade_id', 'ASC')
+            ->paginate($pages);
+                                
         $months_array = [
                             'June', 'July', 
                             'August',  'September', 
@@ -148,42 +250,93 @@ class MonthlyPaymentMonitorController extends Controller
     public function export_pdf_monthly_payment_monitor (Request $request)
     {
 
-        
         $select_columns = 'down_payment, monthly_payment, total_payment, total_remaining, fully_paid, student_id, month_1_payment as m1, month_2_payment as m2, month_3_payment as m3, month_4_payment as m4, month_5_payment as m5, month_6_payment as m6, month_7_payment as m7, month_8_payment as m8, month_9_payment as m9, month_10_payment as m10';
         $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
         
         
-        $Student = Student::with([
-                                'grade', 
-                                'section', 
-                                'tuition' => function ($query) use ($select_columns) {
-                                    $query->selectRaw($select_columns);
-                                    $query->where('status', 1);
-                                },
-                                'grade.tuition_fee' => function ($query) {
-                                    $query->where('status', 1);
-                                },
-                                'discount_list',
-                                'grade_tuition',
-                                'additional_fee'
-                                ])
-                                ->where(function ($query) use ($request) {
-                                    $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+        // $Student = Student::with([
+        //                         'grade', 
+        //                         'section', 
+        //                         'tuition' => function ($query) use ($select_columns, $request) {
+        //                             $query->selectRaw($select_columns);
+        //                             $query->where('school_year_id', $request->report_filter_school_year);
+        //                             $query->where('status', 1);
+        //                         },
+        //                         'grade.tuition_fee' => function ($query) use ($request) {
+        //                             $query->where('school_year_id', $request->report_filter_school_year);
+        //                             $query->where('status', 1);
+        //                         },
+        //                         'discount_list',
+        //                         'grade_tuition',
+        //                         'additional_fee'
+        //                         ])
+        //                         ->where(function ($query) use ($request) {
+        //                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
                                                 
-                                    if ($request->report_filter_grade)
-                                    {
-                                        $query->where('grade_id', $request->report_filter_grade);
-                                    }
+        //                             if ($request->report_filter_grade)
+        //                             {
+        //                                 $query->where('grade_id', $request->report_filter_grade);
+        //                             }
 
-                                    if ($request->report_filter_section)
-                                    {
-                                        $query->where('section_id', $request->report_filter_section);
-                                    }
-                                })
-                                ->where('status', 1)
-                                ->orderBy('grade_id', 'ASC')
-                                ->get();
+        //                             if ($request->report_filter_section)
+        //                             {
+        //                                 $query->where('section_id', $request->report_filter_section);
+        //                             }
+        //                         })
+        //                         ->whereHas('tuition', function ($query) use ($request) {
+        //                             $query->where('school_year_id', $request->report_filter_school_year);
+        //                         })
+        //                         // ->where('status', 1)
+        //                         ->orderBy('grade_id', 'ASC')
+        //                         ->get();
+        
+        $Student = StudentSchoolYearTag::with([
+            'student_info',
+            'grade', 
+            'section', 
+            'tuition' => function ($query) use ($select_columns, $request) {
+                $query->selectRaw($select_columns);
+                $query->where('school_year_id', $request->report_filter_school_year);
+                $query->where('status', 1);
+            },
+            'grade.tuition_fee' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+                $query->where('status', 1);
+            },
+            'discount_list' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            'grade_tuition' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            'additional_fee' => function ($query) use ($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            ])
+            ->where('school_year_id', $request->report_filter_school_year)
+            ->where(function ($query) use ($request) {
+                // $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+                            
+                if ($request->report_filter_grade)
+                {
+                    $query->where('grade_id', $request->report_filter_grade);
+                }
 
+                if ($request->report_filter_section)
+                {
+                    $query->where('section_id', $request->report_filter_section);
+                }
+            })
+            ->whereHas('tuition', function ($query) use ($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            })
+            ->whereHas('student_info', function ($query) use ($request) {
+                $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+            })
+            // ->where('status', 1)
+            ->orderBy('grade_id', 'ASC')
+            ->get();
+                                
         $months_array = [
                             'June', 'July', 
                             'August',  'September', 
@@ -261,17 +414,22 @@ class MonthlyPaymentMonitorController extends Controller
 
         foreach ($Grade as $grd)
         {
-            $StudentTuitionFee = StudentTuitionFee::join('students', 'students.id', '=', 'student_tuition_fees.student_id')
-            ->join('tuition_fees', 'tuition_fees.grade_id', 'students.grade_id')
-            ->join('student_discount_lists', 'student_discount_lists.student_id', 'students.id')
-            ->where(function ($query) use ($grd) {
-                $query->whereRaw('students.grade_id = ' . $grd->id);
+            $StudentTuitionFee = StudentTuitionFee::join('student_school_year_tags', 'student_school_year_tags.student_id', '=', 'student_tuition_fees.student_id')
+            ->join('tuition_fees', 'tuition_fees.grade_id', 'student_school_year_tags.grade_id')
+            ->join('student_discount_lists', 'student_discount_lists.student_id', 'student_school_year_tags.id')
+            ->where(function ($query) use ($grd, $request) {
+
+                $query->whereRaw('tuition_fees.school_year_id = ' . $request->report_filter_school_year);
+                $query->whereRaw('student_school_year_tags.school_year_id = ' . $request->report_filter_school_year);
+                $query->whereRaw('student_school_year_tags.grade_id = ' . $grd->id);
+                $query->whereRaw('student_school_year_tags.status = 1');
             })
-            ->selectRaw('students.grade_id, ' . $selected_mons_cols . ', SUM(down_payment) as total_dp, SUM(total_payment) as total_payment, SUM(tuition_fees.tuition_fee) as tuition_fee, SUM(tuition_fees.misc_fee) as misc_fee,
+            ->selectRaw('student_school_year_tags.grade_id, ' . $selected_mons_cols . ', SUM(down_payment) as total_dp, SUM(total_payment) as total_payment, SUM(tuition_fees.tuition_fee) as tuition_fee, SUM(tuition_fees.misc_fee) as misc_fee,
                 SUM(tuition_fees.upon_enrollment) as upon_enrollment,  
-                SUM(student_discount_lists.scholar) as total_scholar
+                SUM(student_discount_lists.scholar) as total_scholar,
+                tuition_fees.school_year_id
             ')
-            
+            //
                 // , 
                 // SUM(student_discount_lists.school_subsidy) as school_subsidy,
                 // SUM(student_discount_lists.employee_scholar) as employee_scholar,
@@ -284,20 +442,32 @@ class MonthlyPaymentMonitorController extends Controller
                 // SUM(student_discount_lists.st_joseph_discount) as st_joseph_discount
             ->first();
             
-            $Student = Student::with([
-                                'tuition' => function ($query) use ($select_columns) {
+            $Student = StudentSchoolYearTag::with([
+                                'student_info',
+                                'tuition' => function ($query) use ($select_columns, $request) {
                                     $query->selectRaw($select_columns);
+                                    $query->where('school_year_id', $request->report_filter_school_year);
                                     $query->where('status', 1);
                                 },
-                                'grade.tuition_fee' => function ($query) {
+                                'grade.tuition_fee' => function ($query) use ($request) {
+                                    $query->where('school_year_id', $request->report_filter_school_year);
                                     $query->where('status', 1);
                                 },
-                                'discount_list',
-                                'grade_tuition',
-                                'additional_fee'
+                                'discount_list' => function ($query) use ($request) {
+                                    $query->where('school_year_id', $request->report_filter_school_year);
+                                },
+                                'grade_tuition' => function ($query) use ($request) {
+                                    $query->where('school_year_id', $request->report_filter_school_year);
+                                },
+                                'additional_fee' => function ($query) use ($request) {
+                                    $query->where('school_year_id', $request->report_filter_school_year);
+                                },
                                 ])
+                                ->whereHas('tuition', function ($query) use ($request) {
+                                    $query->where('school_year_id', $request->report_filter_school_year);
+                                })
                                 ->where(function ($query) use ($grd) {
-                                    $query->whereRaw('students.grade_id = ' . $grd->id);
+                                    $query->whereRaw('student_school_year_tags.grade_id = ' . $grd->id);
                                 })
                                 ->where('status', 1)
                                 ->get();
@@ -326,12 +496,11 @@ class MonthlyPaymentMonitorController extends Controller
                 $student_discount[] = $discount;
                 $grade_balance[] = $StudentTuitionFee;
             }
-            
         }
         // $student_discount = $student_discount;
 
         // echo $student_discount->where('grd_id', 1)->first();
-        // return json_encode([$grade_balance, $student_discount]);
+        // return json_encode([$request->all()]);
         $pdf = PDF::loadView('reports.monthly_payment_monitor.report.pdf_monthly_payment_summary_monitor', [ 'request' => $request->all(), 'grade_balance' => $grade_balance ,'months_array' => $months_array, 'mon_str_dispay' => $mon_str_dispay, 'month_array_field' => $month_array_field, 'mon_from' => $mon_from, 'mon_to' => $mon_to, 'Grade' => $Grade, 'month_field' => $month_field, 'student_discount' => $student_discount])->setPaper('letter', 'landscape');
 
         $pdf->output();
@@ -345,12 +514,14 @@ class MonthlyPaymentMonitorController extends Controller
         $Student = Student::with([
                                 'grade', 
                                 'section', 
-                                'tuition' => function ($query) use ($select_columns) {
+                                'tuition' => function ($query) use ($select_columns, $request) {
                                     $query->selectRaw($select_columns);
+                                    $query->where('school_year_id', $request->report_filter_school_year);
                                     $query->where('status', 1);
                                 },
-                                'grade.tuition_fee' => function ($query) {
+                                'grade.tuition_fee' => function ($query) use ($request) {
                                     $query->where('status', 1);
+                                    $query->where('school_year_id', $request->report_filter_school_year);
                                 },
                                 'discount_list',
                                 'grade_tuition',
@@ -368,6 +539,9 @@ class MonthlyPaymentMonitorController extends Controller
                                     {
                                         $query->where('section_id', $request->report_filter_section);
                                     }
+                                })
+                                ->whereHas('tuition', function ($query) use ($request) {
+                                    $query->where('school_year_id', $request->report_filter_school_year);
                                 })
                                 ->where('status', 1)
                                 ->orderBy('grade_id', 'ASC')
@@ -410,37 +584,90 @@ class MonthlyPaymentMonitorController extends Controller
         $month_array = [',month_1_payment as m1', ',month_2_payment as m2', ',month_3_payment as m3', ',month_4_payment as m4', ',month_5_payment as m5', ',month_6_payment as m6', ',month_7_payment as m7', ',month_8_payment as m8', ',month_9_payment as m9', ',month_10_payment as m10'];
         
         
-        $Student = Student::with([
-                                'grade', 
-                                'section', 
-                                'tuition' => function ($query) use ($select_columns) {
-                                    $query->selectRaw($select_columns);
-                                    $query->where('status', 1);
-                                },
-                                'grade.tuition_fee' => function ($query) {
-                                    $query->where('status', 1);
-                                },
-                                'discount_list',
-                                'grade_tuition',
-                                'additional_fee'
-                                ])
-                                ->where(function ($query) use ($request) {
-                                    $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+        // $Student = Student::with([
+        //                         'grade', 
+        //                         'section', 
+        //                         'tuition' => function ($query) use ($select_columns, $request) {
+        //                             $query->selectRaw($select_columns);
+        //                             $query->where('school_year_id', $request->report_filter_school_year);
+        //                             $query->where('status', 1);
+        //                         },
+        //                         'grade.tuition_fee' => function ($query) use($request) {
+        //                             $query->where('status', 1);
+        //                             $query->where('school_year_id', $request->report_filter_school_year);
+        //                         },
+        //                         'discount_list',
+        //                         'grade_tuition',
+        //                         'additional_fee'
+        //                         ])
+        //                         ->where(function ($query) use ($request) {
+        //                             $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
                                                 
-                                    if ($request->report_filter_grade)
-                                    {
-                                        $query->where('grade_id', $request->report_filter_grade);
-                                    }
+        //                             if ($request->report_filter_grade)
+        //                             {
+        //                                 $query->where('grade_id', $request->report_filter_grade);
+        //                             }
 
-                                    if ($request->report_filter_section)
-                                    {
-                                        $query->where('section_id', $request->report_filter_section);
-                                    }
-                                })
-                                ->where('status', 1)
-                                ->orderBy('grade_id', 'ASC')
-                                ->get();
+        //                             if ($request->report_filter_section)
+        //                             {
+        //                                 $query->where('section_id', $request->report_filter_section);
+        //                             }
+        //                         })
+        //                         ->whereHas('tuition', function ($query) use ($request) {
+        //                             $query->where('school_year_id', $request->report_filter_school_year);
+        //                         })
+        //                         ->where('status', 1)
+        //                         ->orderBy('grade_id', 'ASC')
+        //                         ->get();
+        
+        
+        $Student = StudentSchoolYearTag::with([
+            'student_info',
+            'grade', 
+            'section', 
+            'tuition' => function ($query) use ($select_columns, $request) {
+                $query->selectRaw($select_columns);
+                $query->where('school_year_id', $request->report_filter_school_year);
+                $query->where('status', 1);
+            },
+            'grade.tuition_fee' => function ($query) use($request) {
+                $query->where('status', 1);
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            'discount_list' => function ($query) use($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            'grade_tuition' => function ($query) use($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            'additional_fee' => function ($query) use($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            },
+            ])
+            ->where(function ($query) use ($request) {
+                // $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+                            
+                if ($request->report_filter_grade)
+                {
+                    $query->where('grade_id', $request->report_filter_grade);
+                }
 
+                if ($request->report_filter_section)
+                {
+                    $query->where('section_id', $request->report_filter_section);
+                }
+            })
+            ->whereHas('tuition', function ($query) use ($request) {
+                $query->where('school_year_id', $request->report_filter_school_year);
+            })
+            ->whereHas('student_info', function ($query) use ($request) {
+                $query->whereRaw("concat(first_name, ' ', middle_name , ' ', last_name) like '%". $request->report_search_filter ."%' ");
+            })
+            
+            ->where('status', 1)
+            ->orderBy('grade_id', 'ASC')
+            ->get();
+                                
         $months_array = [
                             'June', 'July', 
                             'August',  'September', 

@@ -70,12 +70,14 @@
                     <th>Total Tuition</th>
                     <th>Total Misc Fee</th>
                     <th>Total</th>
+                    <th>Total Gov't Subsidy</th>
                 </tr>
                 <?php
                     $total_students = 0;
                     $total_tuition = 0;
                     $total_misc = 0;
                     $over_all_total = 0;
+                    $over_all_gov_subsidy = 0;
                 ?>
                 @foreach ($grade_payments as $data)
                     <?php
@@ -83,6 +85,7 @@
                         $total_tuition += $data['total_tuition'];
                         $total_misc += $data['total_misc'];
                         $over_all_total += $data['total_tuition_fee'];
+                        $over_all_gov_subsidy += $data['total_gov_subsidy'];
                     ?>
                     <tr>
                         <td>
@@ -100,6 +103,9 @@
                         <td class="text-right">
                             {{ a_number_format($data['total_tuition_fee']) }}
                         </td>
+                        <td class="text-right">
+                            {{ a_number_format($data['total_gov_subsidy']) }}
+                        </td>
                     </tr>
                 @endforeach
                     <tr class="text-danger">
@@ -113,6 +119,9 @@
                         </td>
                         <td class="text-right">
                             {{ a_number_format($over_all_total) }}
+                        </td>
+                        <td class="text-right">
+                            {{ a_number_format($over_all_gov_subsidy) }}
                         </td>
                         {{--  <td>
                         </td>

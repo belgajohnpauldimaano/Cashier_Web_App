@@ -4,10 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Student extends Model
+class StudentSchoolYearTag extends Model
 {
-    public $timestamps = false;
-    
     public function grade()
     {
         return $this->hasOne(Grade::class, 'id', 'grade_id');
@@ -20,17 +18,17 @@ class Student extends Model
 
     public function tuition ()
     {
-        return $this->hasMany(StudentTuitionFee::class, 'student_id', 'id');
+        return $this->hasMany(StudentTuitionFee::class, 'student_id', 'student_id');
     }
 
     public function discount ()
     {
-        return $this->hasMany(StudentDiscount::class, 'student_id', 'id');
+        return $this->hasMany(StudentDiscount::class, 'student_id', 'student_id');
     }
 
     public function discount_list ()
     {
-        return $this->hasOne(StudentDiscountList::class, 'student_id', 'id');
+        return $this->hasOne(StudentDiscountList::class, 'student_id', 'student_id');
     }
     
     public function grade_tuition ()
@@ -45,11 +43,11 @@ class Student extends Model
 
     public function additional_fee_payment ()
     {
-        return $this->hasOne(AdditionalFeePayment::class, 'student_id', 'id');
+        return $this->hasOne(AdditionalFeePayment::class, 'student_id', 'student_id');
     }
 
-    public function student_school_year_tag ()
+    public function student_info ()
     {
-        return $this->hasOne(StudentSchoolYearTag::class, 'student_id', 'id');
+        return $this->hasOne(Student::class, 'id', 'student_id');
     }
 }

@@ -90,6 +90,20 @@
                                 </select>
                             </div>
                         </div>
+                        
+                        <div class="col-sm-12 col-md-3 col-lg-3"> 
+                            <div class="form-group">
+                                <label for="">School Year</label>
+                                <select name="filter_school_year" id="filter_school_year" class="form-control js-search_filters">
+                                    {{--  <option value="">All</option>  --}}
+                                    @if($SchoolYear)
+                                        @foreach ($SchoolYear as $data)
+                                            <option value="{{ $data->id }}">{{ $data->school_year }}</option>
+                                        @endforeach
+                                    @endif
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     
                     <button class="btn btn-flat btn-primary btn-sm js-btn_search_filters" type="button"><i class="fa fa-search"></i> Search</button>
@@ -106,6 +120,7 @@
                     <input type="hidden" id="report_filter_section" name="report_filter_section" >
                     <input type="hidden" id="filter_start_date" name="filter_start_date">
                     <input type="hidden" id="filter_end_date" name="filter_end_date">
+                    <input type="hidden" name="report_school_year" value="{{ ($SchoolYear ? $SchoolYear[0]->id : '') }}"> 
                 </form>
                 <form action="{{ route('reports.receivedpayments.received_payments_summary_report') }}" id="form_received_payments_search_summary_report" method="POST">
                     {{ csrf_field() }}   
@@ -115,6 +130,7 @@
                     <input type="hidden" id="filter_start_date" name="filter_start_date" value="">
                     <input type="hidden" id="filter_end_date" name="filter_end_date" value="">
                     <input type="hidden" id="report_payment_type" name="report_payment_type" value="">
+                    <input type="hidden" name="report_school_year" value="{{ ($SchoolYear ? $SchoolYear[0]->id : '') }}"> 
                     
                 </form>
                 <div class="pull-left margin">
@@ -150,16 +166,16 @@
                         <th>Date Received</th>
                         <th>Received by</th>
                         <th>Date Created</th>
-                        {{--  <th>Actions</th>  --}}
+                        <th>Actions</th>
                     </tr>
                     <tbody>
                         @foreach ($StudentPaymentLog as $data)
                             <tr>
                                 <td>
-                                    {{ $data->student->last_name . ' ' . $data->student->first_name . ' ' . $data->student->middle_name }}
+                                   {{ $data->student->last_name . ' ' . $data->student->first_name . ' ' . $data->student->middle_name }}
                                 </td>
                                 <td>
-                                    {{ $data->student->grade->grade . ' / ' . $data->student->section->section_name }}
+                                    {{ $data->student->student_school_year_tag->grade->grade . ' / ' . $data->student->student_school_year_tag->section->section_name }}
                                 </td>
                                 <td>
                                     @if ($data->payment_type == 1)
@@ -175,7 +191,7 @@
                                     <span class="">{{ $data->or_number }}</span>
                                 </td>
                                 <td>
-                                    {{ \Carbon\Carbon::parse($data->received_date, 'Asia/Manila')->format('F d, Y') }}
+                                    {{ \Carbon\Carbon::parse($data->received_date, 'Asia/Manila')->format('F d, Y') }}                                    
                                 </td>
                                 <td>
                                     @if ($data->user)
@@ -187,9 +203,18 @@
                                 <td>
                                     {{ \Carbon\Carbon::parse($data->created_at, 'Asia/Manila')->format('F d, Y') }}
                                 </td>
-                                {{--  <td>
-                                    <button class="btn btn-flat btn-primary btn-sm">Edit Amount</button>
-                                </td>  --}}
+                                <td>
+                                    <div class="input-group-btn">
+                                        <button type="button" class="btn btn-default btn-default dropdown-toggle" data-toggle="dropdown">
+                                            <span class="fa fa-bars"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#" class="js-edit_entry" data-id="{{ $data->id }}"><i class="fa fa-pencil"></i>Edit Entry</a></li>
+                                            <li class=""><a href="#" class="js-delete_entry" data-id="{{ $data->id }}"><i class="fa fa-trash"></i>Delete</a></li>
+                                        </ul>
+                                    </div>
+                                    {{--  <button class="btn btn-flat btn-primary btn-sm js-edit_entry" data-id="{{ $data->id }}"></button>  --}}
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -209,8 +234,6 @@
             autoclose: true
         });
 
-        
-
         $('body').on('submit', '#search', function (e) {
             e.preventDefault();
             var formData = new FormData($('#search')[0]);
@@ -228,10 +251,10 @@
         $('body').on('change', '.js-search_filters', function (e) {
             $('#search').submit();
         });
-
+        var page = 1;
         $('body').on('click' , '.paginate_item', function (e) {
             e.preventDefault();
-            var page = $(this).data('page');
+            page = $(this).data('page');
             var formData = new FormData($('#search')[0]);
             formData.append('page', page);
             fetch_data({
@@ -256,5 +279,64 @@
             $('#form_received_payments_search_summary_report').submit();
         });
         
+        $('body').on('click', '.js-edit_entry', function (e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+            show_form_modal({
+                url         : "{{ route('reports.receivedpayments.edit_payment_modal') }}",
+                reqData     : {
+                                _token  : '{{ csrf_token() }}',
+                                id      : id,
+                                sy_id   : $('#filter_school_year').val()
+                            },
+                target      : $('.js-form_modal_holder'),
+                func        : {}
+            });
+            
+        });
+
+        $('body').on('submit', '#form_entry_correction', function (e) {
+            e.preventDefault();
+            
+            var formData = new FormData($('#search')[0]);
+            formData.append('page', page);
+            
+            save_data({
+                url : "{{ route('reports.receivedpayments.save_edit_entry') }}",
+                form : $(this),
+                fetch_data : {
+                    func    : fetch_data,
+                    params  : {
+                        url         : "{{ route('reports.receivedpayments.list') }}",
+                        formData    : formData,
+                        target      : $('.js-content_holder')
+                    }
+                }
+            })
+        });
+
+        $('body').on('click', '.js-delete_entry', function (e) {
+            e.preventDefault();
+
+            var id = $(this).data('id');
+            var formData = new FormData($('#search')[0]);
+            formData.append('page', page);
+            
+            delete_data({
+                url : "{{ route('reports.receivedpayments.delete_entry') }}",
+                reqData : {
+                    _token  : '{{ csrf_token() }}',
+                    id      : id,
+                },
+                fetch_data : {
+                    func    : fetch_data,
+                    params  : {
+                        url         : "{{ route('reports.receivedpayments.list') }}",
+                        formData    : formData,
+                        target      : $('.js-content_holder')
+                    }
+                }
+            });
+        });
     </script>
 @endsection

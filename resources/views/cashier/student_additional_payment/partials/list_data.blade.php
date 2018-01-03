@@ -3,6 +3,7 @@
                     <input type="hidden" name="pdf_search_filter" value="{{ $request['search_filter'] }}">
                     <input type="hidden" name="pdf_filter_grade" value="{{ $request['filter_grade'] }}"> 
                     <input type="hidden" name="pdf_filter_section" value="{{ $request['filter_section'] }}">   
+                    <input type="hidden" name="pdf_filter_school_year" value="{{ $request['filter_school_year'] }}">   
                 </form>
                 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
                 <div class="pull-right">
@@ -47,10 +48,15 @@
                                 }
 
                                 $outstanding_balance = $total_additional_fee - $total_additional_payment;
+                                
+                                if ($student->status == 0)
+                                {
+                                    $outstanding_balance = 0;
+                                }
                             ?>
                             <tr>
                                 <td>
-                                    {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
+                                        {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
                                 </td>
                                 <td>
                                     @if ($student->grade)
@@ -100,10 +106,14 @@
                                    <strong class="text-blue">{{ a_number_format($outstanding_balance) }}</strong>
                                 </td>
                                 <td>
-                                    @if ($outstanding_balance > 0) 
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->id }}">Pay</button>    
+                                    @if ($student->status == 0)
+                                        <span class="text-red">Inactive</span>
                                     @else
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->id }}">View (Paid)</button>    
+                                        @if ($outstanding_balance > 0) 
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->student_info->id }}">Pay</button>    
+                                        @else
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->student_info->id }}">View (Paid)</button>    
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

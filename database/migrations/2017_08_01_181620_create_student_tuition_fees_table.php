@@ -31,11 +31,13 @@ class CreateStudentTuitionFeesTable extends Migration
             $table->decimal('total_payment', 12, 2)->default('0.00');
             $table->decimal('total_remaining', 12, 2)->default('0.00');
             $table->decimal('total_tuition', 12, 2)->default('0.00');
+            $table->decimal('gov_subsidy', 12, 2)->default('0.00');
             $table->decimal('additional_fee_remaining', 12, 2)->default('0.00');
             $table->decimal('additional_fee_total', 12, 2)->default('0.00');
             $table->decimal('total_discount', 12, 2)->default('0.00');
             $table->tinyInteger('fully_paid')->default('0');
             $table->string('school_year', 20);
+            $table->integer('school_year_id')->unsigned();
             $table->tinyInteger('status')->default('1');
         });
     }

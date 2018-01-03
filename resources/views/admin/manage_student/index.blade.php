@@ -20,7 +20,7 @@
                                 <input type="text" id="search_filter" name="search_filter" class="form-control js-search_filters">
                             </div>
                         </div>
-                        <div class="col-sm-12 col-md-3 col-lg-3"> 
+                        {{--  <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
                                 <label for="">Grade</label>
                                 <select name="filter_grade" id="filter_grade" class="form-control js-search_filters">
@@ -32,8 +32,8 @@
                                     @endif
                                 </select>
                             </div>
-                        </div>
-                        <div class="col-sm-12 col-md-3 col-lg-3"> 
+                        </div>  --}}
+                        {{--  <div class="col-sm-12 col-md-3 col-lg-3"> 
                             <div class="form-group">
                                 <label for="">Section</label>
                                 <select name="filter_section" id="filter_section" class="form-control js-search_filters">
@@ -45,7 +45,7 @@
                                     @endif
                                 </select>
                             </div>
-                        </div>
+                        </div>  --}}
                         <div class="col-sm-12 col-md-3 col-lg-3 pull-right"> 
                             <div class="form-group">
                                 <label for="">Show Entries</label>
@@ -71,8 +71,8 @@
                 <table class="table table-bordered">
                     <tr>
                         <th>Name</th>
-                        <th>Grade</th>
-                        <th>Section</th>
+                        {{--  <th>Grade</th>
+                        <th>Section</th>  --}}
                         <th>Actions</th>
                     </tr>
                     <tbody>
@@ -81,7 +81,7 @@
                                 <td>
                                     {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
                                 </td>
-                                <td>
+                                {{--  <td>
                                     @if ($student->grade)
                                         {{ $student->grade->grade }}
                                     @endif
@@ -90,7 +90,7 @@
                                     @if ($student->section)
                                         {{ $student->section->section_name }}
                                     @endif
-                                </td>
+                                </td>  --}}
                                 <td>
                                     <div class="input-group-btn">
                                         <button type="button" class="btn btn-default btn-default dropdown-toggle" data-toggle="dropdown">
@@ -98,7 +98,9 @@
                                         </button>
                                         <ul class="dropdown-menu">
                                             <li><a href="#" class="js-edit_student_info" data-id="{{ $student->id }}"><i class="fa fa-pencil"></i>Edit</a></li>
-                                            <li><a href="#" class="js-delete_student_info" data-id="{{ $student->id }}"><i class="fa fa-trash"></i>Delete</a></li>
+                                            <li><a href="#" class="js-delete_student_info" data-id="{{ $student->id }}"><i class="fa fa-trash"></i>Deactivate</a></li>
+                                            <li><a href="#" class="js-tag_school_year" data-id="{{ $student->id }}"><i class="fa fa-link"></i>Tag to school Year</a></li>
+                                            
                                         </ul>
                                     </div>
                                 </td>
@@ -220,6 +222,41 @@
             });
         });
 
+        
+        $('body').on('click', '.js-tag_school_year', function (e) {
+            e.preventDefault();
+            var id = $(this).data('id');
+            show_form_modal({
+                url         : "{{ route('admin.manage_student.tag_student_school_year') }}",
+                reqData     : {
+                                _token  : '{{ csrf_token() }}',
+                                id      : id
+                            },
+                target      : $('.js-form_modal_holder'),
+                func        : {}
+            });
+            
+        });
+        
+        $('body').on('submit', '#form_student_tag_school_yer', function (e) {
+            e.preventDefault();
+            
+            var formData = new FormData($('#search')[0]);
+            formData.append('page', 1);
+            
+            save_data({
+                url : "{{ route('admin.manage_student.save_tag_student_school_year') }}",
+                form : $(this),
+                fetch_data : {
+                    func    : fetch_data,
+                    params  : {
+                        url         : "{{ route('admin.manage_student.list') }}",
+                        formData    : formData,
+                        target      : $('.js-content_holder')
+                    }
+                }
+            });
+        });
         /*function show_form_modal (data)
         {
             alert('a');

@@ -1,7 +1,7 @@
 <!doctype>
 <html>
     <head>
-        <title>Student Summary Balance</title>
+        <title>Received Payment Report</title>
             {{--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">      --}}
 
         <style>
@@ -51,7 +51,7 @@
     </head>
     <body>
         <div class="container">
-            <h2 class="text-center">Student Balance Summary Report</h2>
+            <h2 class="text-center">Received Payment Report</h2>
             <div>
                 @if ($range_from)
                     Date Range from 
@@ -81,10 +81,10 @@
                     @foreach ($StudentPaymentLog as $data)
                         <tr>
                             <td>
-                                {{ $data->student->last_name . ' ' . $data->student->first_name . ' ' . $data->student->middle_name }}
+                                {{ $data->student->student_school_year_tag->last_name . ' ' . $data->student->student_school_year_tag->first_name . ' ' . $data->student->student_school_year_tag->middle_name }}
                             </td>
                             <td>
-                                {{ $data->student->grade->grade . ' / ' . $data->student->section->section_name }}
+                                {{ $data->student->student_school_year_tag->grade->grade . ' / ' . $data->student->student_school_year_tag->section->section_name }}
                             </td>
                             <td>
                                 @if ($data->payment_type == 1)
