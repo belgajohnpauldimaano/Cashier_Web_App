@@ -17,4 +17,9 @@ class StudentTuitionFee extends Model
     {
         return $this->belongsTo(Student::class, 'student_id', 'id');
     }
+
+    public function student_info ()
+    {
+        return $this->hasOne(Student::class, 'id', 'student_id');
+    }
 }

@@ -3,6 +3,7 @@
                     <input type="hidden" name="pdf_search_filter" value="{{ $request['search_filter'] }}">
                     <input type="hidden" name="pdf_filter_grade" value="{{ $request['filter_grade'] }}"> 
                     <input type="hidden" name="pdf_filter_section" value="{{ $request['filter_section'] }}">   
+                    <input type="hidden" name="pdf_filter_school_year" value="{{ $request['filter_school_year'] }}">   
                 </form>
                 <div class="overlay hidden"><i class="fa fa-spin fa-refresh"></i></div>
                 <div class="pull-right">
@@ -15,11 +16,10 @@
                         <th>Section</th>
                         <th>Books</th>
                         <th>Speech Lab</th>
-                        <th>PE Uniform</th>
-                        <th>School Uniform</th>
-                        <th>Total Additional Fee</th>
-                        <th>Total Payment</th>
-                        <th>Outstanding Balance</th>
+                        <th>Total Books Payment</th>
+                        <th>Total Speech Lab Payment</th>
+                        <th>Books Balance</th>
+						<th>Speech Lab Balance</th>
                         <th>Actions</th>
                     </tr>
                     <tbody>
@@ -28,6 +28,8 @@
                                 $total_additional_fee = 0 ;
                                 $total_additional_payment = 0;
                                 $outstanding_balance = 0;
+								$payment_books = 0;
+								$payment_sl = 0;
                                 $individual_fee = [];
                                 if ($student->additional_fee)
                                 {
@@ -44,13 +46,21 @@
                                     $total_additional_payment += $student->additional_fee_payment->speech_lab;
                                     $total_additional_payment += $student->additional_fee_payment->pe_uniform;
                                     $total_additional_payment += $student->additional_fee_payment->school_uniform;
+									$payment_books = $student->additional_fee_payment->books;
+									$payment_sl = $student->additional_fee_payment->speech_lab;
                                 }
 
                                 $outstanding_balance = $total_additional_fee - $total_additional_payment;
+                                
+                                if ($student->status == 0)
+                                {
+                                    $outstanding_balance = 0;
+                                }
                             ?>
                             <tr>
                                 <td>
-                                    {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
+                                    {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
+                                    {{--  {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}  --}}
                                 </td>
                                 <td>
                                     @if ($student->grade)
@@ -65,45 +75,54 @@
                                 <td>
                                     @if ($student->additional_fee_payment)
                                         <span class="{{ $individual_fee[0] > $student->additional_fee_payment->books ? 'text-red' : 'text-green'}}">
-                                            {{ a_number_format($student->additional_fee_payment->books) }}
+                                            {{ a_number_format($individual_fee[0]) }}
                                         </span>
                                     @endif
                                 </td>
                                 <td>
                                     @if ($student->additional_fee_payment)
                                         <span class="{{ $individual_fee[1] > $student->additional_fee_payment->speech_lab ? 'text-red' : 'text-green'}}">
-                                            {{ a_number_format($student->additional_fee_payment->speech_lab) }}
+                                            {{ a_number_format($individual_fee[1]) }}
                                         </span>
+                                    @endif
+                                </td>                       
+                                <td>
+								@if ($student->additional_fee_payment)
+                                        <span class="{{ $individual_fee[0] > $student->additional_fee_payment->books ? 'text-red' : 'text-green'}}">
+                                   {{ a_number_format($payment_books) }}
+								   </span>
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($student->additional_fee_payment)
-                                        <span class="{{ $individual_fee[2] > $student->additional_fee_payment->pe_uniform ? 'text-red' : 'text-green'}}">
-                                            {{ a_number_format($student->additional_fee_payment->pe_uniform) }}
-                                        </span>
-                                    @endif
+								@if ($student->additional_fee_payment)
+                                <span class="{{ $individual_fee[1] > $student->additional_fee_payment->speech_lab ? 'text-red' : 'text-green'}}">
+                                   {{ a_number_format($payment_sl) }}
+                                </td>  
+								</span>
+                                 @endif								
+                                <td>
+								@if ($student->additional_fee_payment)
+                                <span class="{{ $individual_fee[0] > $student->additional_fee_payment->books ? 'text-red' : 'text-green'}}">
+                                   {{ a_number_format($individual_fee[0] - $payment_books) }}
+                                </td>
+								</span>
+                                 @endif	
+								 <td>
+								 @if ($student->additional_fee_payment)
+                                <span class="{{ $individual_fee[1] > $student->additional_fee_payment->speech_lab ? 'text-red' : 'text-green'}}">
+                                   {{ a_number_format($individual_fee[1] - $payment_sl) }}
                                 </td>
                                 <td>
-                                    @if ($student->additional_fee_payment)
-                                        <span class="{{ $individual_fee[3] > $student->additional_fee_payment->school_uniform ? 'text-red' : 'text-green'}}">
-                                            {{ a_number_format($student->additional_fee_payment->school_uniform) }}
-                                        </span>
-                                    @endif
-                                </td>
-                                <td>
-                                   <strong class="text-red">{{ a_number_format($total_additional_fee) }}</strong>
-                                </td>
-                                <td>
-                                   <strong class="text-green">{{ a_number_format($total_additional_payment) }}</strong>
-                                </td>     
-                                <td>
-                                   <strong class="text-blue">{{ a_number_format($outstanding_balance) }}</strong>
-                                </td>
-                                <td>
-                                    @if ($outstanding_balance > 0) 
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->id }}">Pay</button>    
+								</span>
+                                 @endif	
+                                    @if ($student->status == 0)
+                                        <span class="text-red">Inactive</span>
                                     @else
-                                        <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->id }}">View (Paid)</button>    
+                                        @if ($outstanding_balance > 0) 
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->student_info->id }}">Pay</button>    
+                                        @else
+                                            <button class="btn btn-primary btn-flat btn-sm js-pay" data-id="{{ $student->student_info->id }}">View (Paid)</button>    
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

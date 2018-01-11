@@ -19,6 +19,7 @@ class CreateAdditionalFeePaymentsTable extends Migration
             $table->decimal('speech_lab', 12, 2)->default('0.00');
             $table->decimal('pe_uniform', 12, 2)->default('0.00');
             $table->decimal('school_uniform', 12, 2)->default('0.00');
+            $table->decimal('book_remarks', 12, 2)->default('0.00');
             $table->integer('student_id')->unsigned();
             $table->timestamps();
         });

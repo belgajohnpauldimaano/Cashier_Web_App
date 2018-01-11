@@ -17,16 +17,21 @@ use App\StudentTuitionFee;
 use App\Discount;
 use App\StudentDiscount;
 use App\StudentDiscountList;
+use App\SchoolYear;
+use App\StudentSchoolYearTag;
+
 class StudentController extends Controller
 {
     public function index ()
     {
-        $Students = Student::with(['grade', 'section'])
-                            ->where('status', 1)
-                            ->paginate(10);
+        // $Students = Student::with(['grade', 'section'])
+        //                     ->where('status', 1)
+        //                     ->paginate(10);
+                            
+        $Students = Student::where('status', 1)
+        ->paginate(10);
         $Grade = Grade::all();
         $Section = Section::where('grade_id', 1)->get();
-
         return view('admin.manage_student.index', ['Students' => $Students, 'Grade' => $Grade, 'Section' => $Section]);
     }
 
@@ -35,7 +40,7 @@ class StudentController extends Controller
         $pages = 10;
         if ($request->show_count == '')
         {
-            $pages = 0;
+            $pages = 100000;
         }
         else
         {
@@ -68,7 +73,8 @@ class StudentController extends Controller
         $Student = NULL;
         if ($request->id)
         {
-            $Student = Student::with(['grade', 'section', 'discount_list'])->where('id', $request->id)->first();
+            // $Student = Student::with(['grade', 'section', 'discount_list'])->where('id', $request->id)->first();
+            $Student = Student::where('id', $request->id)->first();
             // return json_encode($Student);
         }
         $Grade = Grade::all();
@@ -84,8 +90,8 @@ class StudentController extends Controller
                 'first_name'        => 'required',
                 'middle_name'       => 'required',
                 'last_name'         => 'required',
-                'grade'             => 'required',
-                'section'           => 'required',
+                // 'grade'             => 'required',
+                // 'section'           => 'required',
                 
         ];
         
@@ -142,30 +148,31 @@ class StudentController extends Controller
             $Student->first_name        = $request->first_name;
             $Student->middle_name       = $request->middle_name;
             $Student->last_name         = $request->last_name;
-            $Student->grade_id          = $request->grade;
-            $Student->section_id        = $request->section;
+            // $Student->grade_id          = $request->grade;
+            // $Student->section_id        = $request->section;
+            $Student->status            = 1;
             $Student->save();
             
-            $StudentDiscountList = StudentDiscountList::where('student_id', $request->id)->first();
-            $StudentDiscountList->scholar = ($request->scholar              ? $request->scholar             / 100   : '0.00');
-            $StudentDiscountList->school_subsidy = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
-            $StudentDiscountList->employee_scholar = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
-            $StudentDiscountList->gov_subsidy = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
-            $StudentDiscountList->acad_scholar = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
-            $StudentDiscountList->family_member = ($request->family_member        ? $request->family_member       / 100   : '0.00');
-            $StudentDiscountList->nbi_alumni = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
-            $StudentDiscountList->cash_discount = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
-            $StudentDiscountList->cwoir_discount = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
-            $StudentDiscountList->st_joseph_discount = ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
-            $StudentDiscountList->student_id = $Student->id;
-            $StudentDiscountList->save();
+            // $StudentDiscountList = StudentDiscountList::where('student_id', $request->id)->first();
+            // $StudentDiscountList->scholar = ($request->scholar              ? $request->scholar             / 100   : '0.00');
+            // $StudentDiscountList->school_subsidy = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
+            // $StudentDiscountList->employee_scholar = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
+            // $StudentDiscountList->gov_subsidy = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
+            // $StudentDiscountList->acad_scholar = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
+            // $StudentDiscountList->family_member = ($request->family_member        ? $request->family_member       / 100   : '0.00');
+            // $StudentDiscountList->nbi_alumni = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
+            // $StudentDiscountList->cash_discount = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
+            // $StudentDiscountList->cwoir_discount = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
+            // $StudentDiscountList->st_joseph_discount = ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
+            // $StudentDiscountList->student_id = $Student->id;
+            // $StudentDiscountList->save();
 
-            if ($Student->additional_fee_payment == NULL)
-            {
-                $AdditionalFeePayment = new \App\AdditionalFeePayment();
-                $AdditionalFeePayment->student_id = $Student->id;
-                $AdditionalFeePayment->save();
-            }
+            // if ($Student->additional_fee_payment == NULL)
+            // {
+            //     $AdditionalFeePayment = new \App\AdditionalFeePayment();
+            //     $AdditionalFeePayment->student_id = $Student->id;
+            //     $AdditionalFeePayment->save();
+            // }
 
             return response()->json(['code' => 0, 'general_message' => 'Student information successfully saved.', 'messages' => []]);
         }
@@ -174,39 +181,40 @@ class StudentController extends Controller
         {
             DB::beginTransaction();
             $Student = new Student();
-            $Student->student_number    = '';
+            $Student->student_number    = '1';
             $Student->first_name        = $request->first_name;
             $Student->middle_name       = $request->middle_name;
             $Student->last_name         = $request->last_name;
-            $Student->grade_id          = $request->grade;
-            $Student->section_id        = $request->section;
+            $Student->status            = 1;
+            // $Student->grade_id          = $request->grade;
+            // $Student->section_id        = $request->section;
             $Student->save();
 
             
         
-            $StudentDiscountList = new StudentDiscountList();
-            $StudentDiscountList->scholar = ($request->scholar              ? $request->scholar             / 100   : '0.00');
-            $StudentDiscountList->school_subsidy = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
-            $StudentDiscountList->employee_scholar = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
-            $StudentDiscountList->gov_subsidy = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
-            $StudentDiscountList->acad_scholar = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
-            $StudentDiscountList->family_member = ($request->family_member        ? $request->family_member       / 100   : '0.00');
-            $StudentDiscountList->nbi_alumni = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
-            $StudentDiscountList->cash_discount = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
-            $StudentDiscountList->cwoir_discount = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
-            $StudentDiscountList->st_joseph_discount = ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
-            $StudentDiscountList->student_id = $Student->id;
-            $StudentDiscountList->save();
+            // $StudentDiscountList = new StudentDiscountList();
+            // $StudentDiscountList->scholar = ($request->scholar              ? $request->scholar             / 100   : '0.00');
+            // $StudentDiscountList->school_subsidy = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
+            // $StudentDiscountList->employee_scholar = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
+            // $StudentDiscountList->gov_subsidy = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
+            // $StudentDiscountList->acad_scholar = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
+            // $StudentDiscountList->family_member = ($request->family_member        ? $request->family_member       / 100   : '0.00');
+            // $StudentDiscountList->nbi_alumni = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
+            // $StudentDiscountList->cash_discount = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
+            // $StudentDiscountList->cwoir_discount = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
+            // $StudentDiscountList->st_joseph_discount = ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
+            // $StudentDiscountList->student_id = $Student->id;
+            // $StudentDiscountList->save();
 
             
-            $StudentTuitionFee = new StudentTuitionFee();
-            $StudentTuitionFee->student_id  = $Student->id;
-            $StudentTuitionFee->school_year = $this->formulate_sy();
-            $StudentTuitionFee->save();
+            // $StudentTuitionFee = new StudentTuitionFee();
+            // $StudentTuitionFee->student_id  = $Student->id;
+            // $StudentTuitionFee->school_year = $this->formulate_sy();
+            // $StudentTuitionFee->save();
 
-            $AdditionalFeePayment = new \App\AdditionalFeePayment();
-            $AdditionalFeePayment->student_id = $Student->id;
-            $AdditionalFeePayment->save();
+            // $AdditionalFeePayment = new \App\AdditionalFeePayment();
+            // $AdditionalFeePayment->student_id = $Student->id;
+            // $AdditionalFeePayment->save();
 
 
             DB::commit();
@@ -305,5 +313,140 @@ class StudentController extends Controller
                                                 ->first();
         echo $AdditionalFees->additional_fee_total;
         return json_encode($AdditionalFees);
+    }
+
+    public function api_student_list (Request $request)
+    {
+        $orderBy = 'students.last_name ASC';
+        
+        $orderByColumns = ['name' => 'students.last_name '];
+
+        if ($request->sortField)
+        {
+            $orderBy = $orderByColumns[$request->sortField];
+
+            if ($request->sortOrder == 'descend')
+            {
+                $orderBy .= ' DESC';
+            }
+            else
+            {
+                $orderBy .= ' ASC';
+            }
+        }
+
+        $Students = Student::with(['grade', 'section'])
+        ->where('status', 1)
+        ->where(function ($query) use ($request) {
+            // $query->where('students.first_name', 'like', '%'.$request->search.'%');
+            // $query->orWhere('students.last_name', 'like', '%'.$request->search.'%');
+        })
+        ->selectRaw("
+            students.id,
+            concat(students.last_name, ' ', students.first_name) as name
+        ")
+        ->orderByRaw($orderBy)
+        ->paginate(10);
+
+        return response()->json(['Students' => $Students], 200);
+    }
+
+    public function api_student_list_mobile (Request $request)
+    {
+        $orderBy = 'students.last_name ASC';
+        
+        $orderByColumns = ['name' => 'students.last_name '];
+
+        if ($request->sortField)
+        {
+            $orderBy = $orderByColumns[$request->sortField];
+
+            if ($request->sortOrder == 'descend')
+            {
+                $orderBy .= ' DESC';
+            }
+            else
+            {
+                $orderBy .= ' ASC';
+            }
+        }
+
+        $Students = Student::with(['grade', 'section'])
+        ->where('status', 1)
+        ->where(function ($query) use ($request) {
+            // $query->where('students.first_name', 'like', '%'.$request->search.'%');
+            // $query->orWhere('students.last_name', 'like', '%'.$request->search.'%');
+        })
+        ->selectRaw("
+            students.id,
+            concat(students.last_name, ' ', students.first_name) as name
+        ")
+        ->orderByRaw($orderBy)
+        ->paginate(10);
+        
+        return response()->json(['Students' => $Students], 200);
+    }
+
+    public function tag_student_school_year (Request $request) 
+    {
+        $Student = NULL;
+        $Student = Student::with(['grade', 'section', 'discount_list'])->where('id', $request->id)->first();
+        $SchoolYear = SchoolYear::all();
+        $Grade = Grade::all();
+        $Section = Section::where('grade_id', 1)->get();
+        return view('admin.manage_student.partials.form_modal_tag_school_year', ['Student' => $Student, 'Section' => $Section, 'SchoolYear' => $SchoolYear, 'Grade' => $Grade])->render();
+    }
+
+    public function save_tag_student_school_year (Request $request)
+    {
+        $StudentSchoolYearTag = StudentSchoolYearTag::where('student_id', $request->id)->where('school_year_id', $request->school_year)->first();
+        
+        if ($StudentSchoolYearTag)
+        {
+            return response()->json(['code' => 2, 'general_message' => 'Student was already tagged to selected school year.', 'messages' => []]);
+        }
+
+        $StudentSchoolYearTag = new StudentSchoolYearTag();
+        $StudentSchoolYearTag->student_id = $request->id;
+        $StudentSchoolYearTag->grade_id = $request->grade;
+        $StudentSchoolYearTag->section_id = $request->section;
+        $StudentSchoolYearTag->school_year_id = $request->school_year;
+        $StudentSchoolYearTag->save();
+
+        $StudentTuitionFee = StudentTuitionFee::where('student_id', $request->id)->where('school_year_id', $request->school_year)->first();
+        
+        if ($StudentTuitionFee)
+        {
+            return response()->json(['code' => 2, 'general_message' => 'Student was already tagged to selected school year.', 'messages' => []]);
+        }
+
+        $StudentDiscountList                    = new StudentDiscountList();
+        $StudentDiscountList->scholar           = ($request->scholar              ? $request->scholar             / 100   : '0.00');
+        $StudentDiscountList->school_subsidy    = ($request->school_subsidy       ? $request->school_subsidy              : '0.00');
+        $StudentDiscountList->employee_scholar  = ($request->employee_scholar     ? $request->employee_scholar    / 100   : '0.00');
+        $StudentDiscountList->gov_subsidy       = ($request->gov_subsidy          ? $request->gov_subsidy                 : '0.00');
+        $StudentDiscountList->acad_scholar      = ($request->acad_scholar         ? $request->acad_scholar        / 100   : '0.00');
+        $StudentDiscountList->family_member     = ($request->family_member        ? $request->family_member       / 100   : '0.00');
+        $StudentDiscountList->nbi_alumni        = ($request->nbi_alumni           ? $request->nbi_alumni          / 100   : '0.00');
+        $StudentDiscountList->cash_discount     = ($request->cash_discount        ? $request->cash_discount       / 100   : '0.00');
+        $StudentDiscountList->cwoir_discount    = ($request->cwoir_discount       ? $request->cwoir_discount      / 100   : '0.00');
+        $StudentDiscountList->st_joseph_discount= ($request->st_jospeh_discount   ? $request->st_jospeh_discount          : '0.00');
+        $StudentDiscountList->student_id        = $request->id;
+        $StudentDiscountList->school_year_id    = $request->school_year;
+        $StudentDiscountList->save();
+
+        
+        $StudentTuitionFee = new StudentTuitionFee();
+        $StudentTuitionFee->student_id  = $request->id;
+        $StudentTuitionFee->school_year = $this->formulate_sy();
+        $StudentTuitionFee->school_year_id = $request->school_year;
+        $StudentTuitionFee->save();
+
+        $AdditionalFeePayment = new \App\AdditionalFeePayment();
+        $AdditionalFeePayment->student_id = $request->id;
+        $AdditionalFeePayment->school_year_id = $request->school_year;
+        $AdditionalFeePayment->save();
+        
+        return response()->json(['code' => 0, 'general_message' => 'Student successfully tagged to school year.', 'messages' => []]);
     }
 }

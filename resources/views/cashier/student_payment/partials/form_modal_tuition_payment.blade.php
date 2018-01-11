@@ -12,6 +12,7 @@
                 <div class="modal-body">
                     @if($outstanding_balance > 0)
                         {{ csrf_field() }}
+                        <input type="hidden" name="sy_id" value="{{ $filter_school_year }}">
                         @if($student_id) 
                             <input type="hidden" name="id" value="{{ $student_id }}"> 
                         @endif 
@@ -22,8 +23,16 @@
                             </h3>
                         </div>
                         <div class="form-group">
+                            <label for="">Payment Type <span class="text-red"></span></label>
+                            <select name="payment_type" id="payment_type" class="form-control">
+                                <option value="1">Tuition Payment</option>
+                                <option value="6">Government Subsidy</option>
+                            </select>
+                            <div class="help-block text-center" id="payment_type-error"></div>
+                        </div>
+                        <div class="form-group">
                             <label for="">Payment <span class="text-red"></span></label>
-                            <input type="number" class="form-control" name="payment" id="payment" min="1">
+                            <input type="number" step="any" class="form-control" name="payment" id="payment" min="1">
                             <div class="help-block text-center" id="payment-error"></div>
                         </div>
                         <div class="form-group">

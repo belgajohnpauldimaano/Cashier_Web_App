@@ -1,7 +1,7 @@
 <!doctype>
 <html>
     <head>
-        <title>Student Summary Balance</title>
+        <title>Received Payments Summary Report</title>
             {{--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">      --}}
 
         <style>
@@ -60,7 +60,7 @@
     </head>
     <body>
         <div class="container">
-            <h2 class="text-center">Student Balance Summary Report</h2>
+            <h2 class="text-center">Received Payments Summary Report</h2>
             <div>
                 @if ($range_from)
                     Date Range from 

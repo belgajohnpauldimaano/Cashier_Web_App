@@ -20,6 +20,7 @@ class CreateAdditionalFeesTable extends Migration
             $table->decimal('additional_amount', 12, 2);
             $table->tinyInteger('discount_percentage')->default('1');
             $table->string('school_year', 20);
+            $table->integer('school_year_id')->unsigned();
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
         });

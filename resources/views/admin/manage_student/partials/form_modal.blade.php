@@ -30,7 +30,7 @@
                         <div class="help-block text-center" id="last_name-error"></div>
                     </div>
                     
-                    <div class="form-group">
+                    {{--  <div class="form-group">
                         <label for="">Grade <span class="text-red">*</span></label>
                         <select class="form-control"  name="grade" id="grade">
                             <option value="">Select Grade</option>
@@ -54,7 +54,7 @@
                             @endif
                         </select>
                         <div class="help-block text-center" id="section-error"></div>
-                    </div>
+                    </div>  --}}
 
                     {{--  @foreach ($Discount as $data)
                         <div class="checkbox">
@@ -62,7 +62,7 @@
                             {{--  <input type="text" name="discounts_id[]" value="{{ $data->id }}">  --}}
                         {{--  </div>
                     @endforeach  --}}
-                    <table class="table table-bordered table-striped">
+                    {{--  <table class="table table-bordered table-striped">
                         <thead>
                             <tr>
                                 <th class="text-center" colspan="2">Discounts</th>
@@ -158,7 +158,7 @@
                                 </td>
                             </tr>
                         </tbody>
-                    </table>
+                    </table>  --}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default btn-flat" data-dismiss="modal">Cancel</button>

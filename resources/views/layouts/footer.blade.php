@@ -140,6 +140,7 @@
                     url : data.url,
                     type : 'POST',
                     data : formData,
+                    dataType : 'JSON',
                     processData : false,
                     contentType : false,
                     success     : function (res) {

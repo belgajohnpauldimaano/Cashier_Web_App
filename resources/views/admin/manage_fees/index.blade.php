@@ -80,23 +80,23 @@
                                     {{ $data->grade }}
                                 </td>
                                 <td>
-                                    @if ($data->tuition_fee)
+                                    @if (count($data->tuition_fee) > 0)
                                         &#8369; {{ a_number_format($data->tuition_fee[0]->tuition_fee) }}
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($data->tuition_fee)
+                                    @if (count($data->tuition_fee) > 0)
                                         &#8369; {{ a_number_format($data->tuition_fee[0]->misc_fee) }}
                                     @endif
                                 </td>
                                 <td>
-                                    @if ($data->tuition_fee)
-                                        <?php $additional_fee = 0; ?>
+                                    <?php $additional_fee = 0; ?>
+                                    @if (count($data->tuition_fee) > 0)
                                         @foreach ($data->additional_fee as $add_fee)
                                             <?php $additional_fee += $add_fee->additional_amount; ?>
                                         @endforeach
-                                        &#8369; {{ a_number_format($additional_fee) }}
                                     @endif
+                                    &#8369; {{ a_number_format($additional_fee) }}
                                 </td>
                                 <td>
                                     <div class="input-group-btn">
@@ -121,11 +121,13 @@
 
 @section ('scripts')
     <script>
+        var sy_id = {{$sy_id}};
         $('body').on('click', '.js-create_new_student', function () {
             show_form_modal({
                 url         : "{{ route('admin.manage_student.form_modal') }}",
                 reqData     : {
-                                _token  : '{{ csrf_token() }}'
+                                _token  : '{{ csrf_token() }}', 
+                                sy_id   : sy_id
                             },
                 target      : $('.js-form_modal_holder'),
                 func        : {}
@@ -144,7 +146,8 @@
                 url         : "{{ route('admin.manage_fees.form_modal') }}",
                 reqData     : {
                                 _token  : '{{ csrf_token() }}',
-                                id      : id
+                                id      : id, 
+                                sy_id   : sy_id
                             },
                 target      : $('.js-form_modal_holder'),
                 func        : {}
@@ -162,6 +165,7 @@
             
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
+            
             delete_data({
                 url         : "{{ route('admin.manage_student.delete') }}",
                 reqData     : {
@@ -183,11 +187,13 @@
         
         
 
-        $('body').on('submit', '#form_student', function (e) {
+        $('body').on('submit', '#form_manage_fees', function (e) {
             e.preventDefault();
             
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
+            formData.append('sy_id', sy_id);
+            
             
             save_data({
                 url : "{{ route('admin.manage_fees.save_data') }}",
@@ -210,6 +216,7 @@
         $('body').on('change', '.js-search_filters', function (e) {
             var formData = new FormData($('#search')[0]);
             formData.append('page', 1);
+            formData.append('sy_id', sy_id);
             fetch_data({
                 url         : "{{ route('admin.manage_fees.list') }}",
                 formData    : formData,
@@ -222,6 +229,7 @@
             var page = $(this).data('page');
             var formData = new FormData($('#search')[0]);
             formData.append('page', page);
+            formData.append('sy_id', sy_id);
             fetch_data({
                 url         : "{{ route('admin.manage_fees.list') }}",
                 formData    : formData,

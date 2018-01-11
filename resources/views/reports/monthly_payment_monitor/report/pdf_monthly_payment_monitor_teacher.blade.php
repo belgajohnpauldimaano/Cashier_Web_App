@@ -5,6 +5,27 @@
             {{--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">      --}}
 
         <style>
+            td.rotate {
+              /* Something you can count on */
+              height: 190px;
+              white-space: nowrap;
+            }
+
+            td.rotate > div {
+              transform: 
+                /* Magic Numbers */
+                translate(25px, 51px)
+                /* 45 is really 360 - 45 */
+                rotate(-90deg);
+              width: 30px;
+            }
+            td.rotate > div > span {
+              border-bottom: 1px solid #ccc;
+              padding: 50px 10px 50px;
+                font-size: 35px;
+                text-align: center;
+                font-weight: 300;
+            }
            body {
                 font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
                 font-size: 10px;
@@ -28,6 +49,7 @@
                             
                 border-spacing: 0;
                 border-collapse: collapse;
+                
             }
             .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th {
                 border: 1px solid #ddd;
@@ -53,11 +75,13 @@
             .hidden {
                 display: none!important;
             }
+            .td{
+                vertical-align: middle;
+            }
         </style>
     </head>
     <body>
         <div class="container">
-            <h2 class="text-center">Student Balance Summary Report</h2>
             <div>
             </div>
             <div class="text-right">Date Generated : {{ \Carbon\Carbon::now('Asia/Manila')->format('m, d, Y h:i a') }}</div>
@@ -66,20 +90,7 @@
             {{--  <div class="text-right">Total Received Payment <strong class="text-danger"><h3>P {{ ($payment_sum->sum ? a_number_format($payment_sum->sum) : '0.00') }}</h3></strong></div>  --}}
             <br>
             <table class="table table-bordered">
-                <tr>
-                    <th>Student Name</th>
-                    <th>Grade / Section</th>
-                    @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
-                        @for($i=$request['report_filter_month']-1;$i<$request['report_filter_month_to'];$i++)
-                            <th>{{ $months_array[$i] }}</th>
-                        @endfor
-                    @else
-                        @foreach($months_array as $mon)
-                            <th>{{ $mon }}</th>
-                        @endforeach
-                    @endif 
-                    <th>Status</th>
-                </tr>
+                
     <tbody>
         @foreach ($Students as $student)
             <?php
@@ -123,52 +134,77 @@
                 }
 
             ?>
-            <tr>
-                <td>
-                    <small>{{ $student->last_name . ', ' . $student->first_name . ' ' . $student->middle_name }}</small>
-                </td>
-                <td>
-                    @if ($student)
-                        <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
-                    @endif
-                </td>
-                @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
+        @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                     @for($i=0;$i<10;$i++)
-                        <td class="{{ (($i>=$request['report_filter_month'] - 1) && ($i<=$request['report_filter_month_to']-1) ? '' : 'hidden') }}">
                             @if ($outstanding_balance == 0)
-                                    <span class="text-green">PAID</span>
                             @else
                                 @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)
-                                    <span class="text-green">PAID</span>
                                 @else
-                                    <span class="text-red">UNPAID</span>
                                     <?php $status = false; ?>
                                 @endif
                             @endif
-                        </td>
                     @endfor
                 @else
                     @for($i=0;$i<10;$i++)
-                        <td >
+                    
                             @if ($outstanding_balance == 0)
-                                    <span class="text-green">PAID</span>
                             @else
                                 @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)
-                                    <span class="text-green">PAID</span>
                                 @else
-                                    <span class="text-red">UNPAID</span>
                                     <?php $status = false; ?>
                                 @endif
                             @endif
                     @endfor
                 @endif
-                <td >
+            <tr>
+                @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
+                    @for($i=0;$i<10;$i++)
+                            @if ($outstanding_balance == 0)
+                            @else
+                                @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)
+                                @else
+                                    <?php $status = false; ?>
+                                @endif
+                            @endif
+                    @endfor
+                @else
+                    @for($i=0;$i<10;$i++)
+                    
+                            @if ($outstanding_balance == 0)
+                            @else
+                                @if ($student->tuition[0][$month_field[$i]] == $tmp_monthly_amount)
+                                @else
+                                    <?php $status = false; ?>
+                                @endif
+                            @endif
+                    @endfor
+                @endif
+                <td class="rotate">
+                    <br><br><br><br>
                     @if ($status) 
-                        <span class="text-green">PAID</span>
+                       <div><span class="text-green">PAID</span></div>
                     @else
-                        <span class="text-red">UNPAID</span>        
+                       <center><span class="text-red"></span></center>        
                     @endif
                 </td>
+                     <td style="font-size: 15px;">
+                     <center><img src="{{ asset('img/header.jpg') }}" style="height: 79px; width: 600px;"></center>
+                    <strong style="font-size: 19px;">EXAMINATION PERMIT - <i>{{ $months_array[$request['report_filter_month_to']-1] }} {{ \Carbon\Carbon::now('Asia/Manila')->format('Y') }} </i></strong><br><br>
+                    <small style="font-size: 25px;">{{ $student->student_info->last_name . ', ' . $student->student_info->first_name . ' ' . $student->student_info->middle_name }}</small>
+                          @if ($student)
+                        <i><small style="font-size: 17px;">({{ $student->grade->grade . ' / ' . $student->section->section_name }})</small></i>
+						@endif
+						<br><br>
+						<div class="col-md-6 text-right" style="line-height: 90%">
+						<strong><small>JOCELYN I. TAJONERA  </small></strong>
+                      <br>
+					  	<small>Finance Officer/Bookkeeper</small>
+						<div>
+
+					  <center style="font-size: 8px;"><small>** NOT VALID WITHOUT SIGNATURE **</small></center>
+				
+                </td>
+               
             </tr>
         @endforeach
     </tbody>

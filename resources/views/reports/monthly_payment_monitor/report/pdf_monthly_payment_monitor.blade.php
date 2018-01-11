@@ -57,7 +57,8 @@
     </head>
     <body>
         <div class="container">
-            <h2 class="text-center">Student Balance Summary Report</h2>
+            <h2 class="text-center">Student Balance on Tuition Fees</h2>
+            <h4 class="text-center">as of {{ $months_array[$request['report_filter_month_to']-1] }} {{ \Carbon\Carbon::now('Asia/Manila')->format('Y') }}</h4>
             <div>
             </div>
             <div class="text-right">Date Generated : {{ \Carbon\Carbon::now('Asia/Manila')->format('m, d, Y h:i a') }}</div>
@@ -69,9 +70,9 @@
                 <tr>
                     <th>Student Name</th>
                     <th>Grade / Section</th>
-                    <th>Tuition Fee</th>
-                    <th>Down Payment</th>
-                    <th>Discount</th>
+                    <th>Net Tuition Fee</th>
+					{{-- <th>Discount</th> --}}
+                    <th>UE / Registration</th>
                     @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                         @for($i=$request['report_filter_month']-1;$i<$request['report_filter_month_to'];$i++)
                             <th>{{ $months_array[$i] }}</th>
@@ -168,11 +169,11 @@
                         <small>{{ $student->grade->grade . ' / ' . $student->section->section_name }}</small>
                     @endif
                 </td>
-                <td class="text-right">{{ a_number_format($tuition_fee) }}</td>
+                <td class="text-right">{{ a_number_format($net_tuition) }}</td>
+				{{-- <td class="text-right">{{ a_number_format($discount) }}</td> --}}
                 <td class="text-right"> 
                     <span class=""> {{ a_number_format($student->tuition[0]->down_payment) }} </span> 
                 </td>
-                <td class="text-right">{{ a_number_format($discount) }}</td>
                 @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                     @for($i=0;$i<10;$i++)
                         <td class="{{ (($i>=$request['report_filter_month'] - 1) && ($i<=$request['report_filter_month_to']-1) ? '' : 'hidden') }} text-right">
@@ -239,8 +240,8 @@
         <tr>
             <td colspan="2">Total</td>
             <td class="text-right">{{ a_number_format($grand_total_tuition) }}</td>
+			{{-- <td class="text-right">{{ a_number_format($grand_total_discount) }}</td> --}}
             <td class="text-right">{{ a_number_format($grand_total_dp) }}</td>
-            <td class="text-right">{{ a_number_format($grand_total_discount) }}</td>
             @if ($request['report_filter_month'] != '' && $request['report_filter_month_to'] != '')
                 @for($i=$request['report_filter_month'] - 1;$i<$request['report_filter_month_to'];$i++)
                     <td>{{ a_number_format($month_total[$month_field[$i]]) }}</td>

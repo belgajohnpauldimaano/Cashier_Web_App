@@ -1,7 +1,7 @@
 <!doctype>
 <html>
     <head>
-        <title>Student Summary Balance</title>
+        <title>Received Payment Report</title>
             {{--  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">      --}}
 
         <style>
@@ -51,7 +51,7 @@
     </head>
     <body>
         <div class="container">
-            <h2 class="text-center">Student Balance Summary Report</h2>
+            <h2 class="text-center">Received Payment Report</h2>
             <div>
                 @if ($range_from)
                     Date Range from 
@@ -72,19 +72,26 @@
                     <th>Student Name</th>
                     <th>Grade / Section</th>
                     <th>Payment Type</th>
-                    <th>Payment Amount</th>
                     <th>OR Number</th>
                     <th>Date Received</th>
                     <th>Received by</th>
+					 <th>Payment Amount</th>
                 </tr>
                 <tbody>
+				<?php
+					$grand_total = 0;
+				?>
+	
                     @foreach ($StudentPaymentLog as $data)
+					<?php
+                        $grand_total += $data->payment;
+						?>
                         <tr>
                             <td>
-                                {{ $data->student->last_name . ' ' . $data->student->first_name . ' ' . $data->student->middle_name }}
+                                {{ $data->student->last_name  . ', ' . $data->student->first_name . ' ' . $data->student->middle_name }}
                             </td>
                             <td>
-                                {{ $data->student->grade->grade . ' / ' . $data->student->section->section_name }}
+                                {{ $data->student->student_school_year_tag->grade->grade . ' / ' . $data->student->student_school_year_tag->section->section_name }}
                             </td>
                             <td>
                                 @if ($data->payment_type == 1)
@@ -93,9 +100,7 @@
                                     <span>{{ \App\AdditionalFee::ADDITIONAL_FEES[$data->payment_type]['fee_name'] }}</span>
                                 @endif
                             </td>
-                            <td class="text-right">
-                                <span class="text-red"> {{ a_number_format($data->payment) }}</span>
-                            </td>
+                            
                             <td class="text-right">
                                 <span class="">{{ $data->or_number }}</span>
                             </td>
@@ -109,8 +114,14 @@
                                     <span>n/a</span>
                                 @endif
                             </td>
+							<td class="text-right">
+                                <span class="text-red"> {{ a_number_format($data->payment) }}</span>
+                            </td>
                         </tr>
                     @endforeach
+					<tr class="text-danger">
+                        <td colspan="6">Total</td>
+                        <td colspan="1" class="text-right">{{ a_number_format($grand_total) }}</td>
                 </tbody>
             </table>
         </div>

@@ -28,9 +28,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('list', 'Admin\StudentController@list')->name('admin.manage_student.list');
         Route::post('delete', 'Admin\StudentController@delete')->name('admin.manage_student.delete');
         Route::get('formulate_sy', 'Admin\StudentController@formulate_sy')->name('admin.manage_student.formulate_sy');
+        Route::post('tag-student-school-year', 'Admin\StudentController@tag_student_school_year')->name('admin.manage_student.tag_student_school_year');
+        Route::post('save-tag-student-school-year', 'Admin\StudentController@save_tag_student_school_year')->name('admin.manage_student.save_tag_student_school_year'); 
     });
     Route::group(['prefix' => 'manage-fees'], function () {
-        Route::get('', 'Admin\ManageFeeController@index')->name('admin.manage_fees.index');
+        Route::get('{sy_id?}', 'Admin\ManageFeeController@index')->name('admin.manage_fees.index');
         Route::post('form-modal', 'Admin\ManageFeeController@form_modal')->name('admin.manage_fees.form_modal');
         Route::post('save_data', 'Admin\ManageFeeController@save_data')->name('admin.manage_fees.save_data');
         Route::post('list', 'Admin\ManageFeeController@list')->name('admin.manage_fees.list');
@@ -41,6 +43,28 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('list', 'Admin\ManageDiscountsController@list')->name('admin.manage_discounts.list');
         Route::post('form-modal', 'Admin\ManageDiscountsController@form_modal')->name('admin.manage_discounts.form_modal');
         Route::post('save-data', 'Admin\ManageDiscountsController@save_data')->name('admin.manage_discounts.save_data');
+        
+    });
+
+    Route::group(['prefix' => 'manage-school-years'], function () {
+        Route::get('', 'Admin\SchoolYearController@index')->name('admin.manage_school_years.index');
+        Route::post('list-data', 'Admin\SchoolYearController@list_data')->name('admin.manage_school_years.list_data');
+        Route::post('modal-school-year', 'Admin\SchoolYearController@modal_school_year')->name('admin.manage_school_years.modal_school_year');
+        Route::post('save-data', 'Admin\SchoolYearController@save_data')->name('admin.manage_school_years.save_data');
+    });
+    
+    Route::group(['prefix' => 'student-tagged-school-year'], function () {
+        Route::get('{sy_id?}', 'Admin\SchoolYearController@student_school_year_tagged')->name('admin.student_tagged_school_year.student_school_year_tagged');
+        Route::post('form-modal', 'Admin\SchoolYearController@form_modal')->name('admin.student_tagged_school_year.form_modal');
+        Route::post('save-data-student', 'Admin\SchoolYearController@save_data_student')->name('admin.student_tagged_school_year.save_data_student');
+        Route::post('student-school-year-tagged-list_data', 'Admin\SchoolYearController@student_school_year_tagged_list_data')->name('admin.student_tagged_school_year.student_school_year_tagged_list_data');
+        Route::post('deactivate-student', 'Admin\SchoolYearController@deactivate_student')->name('admin.student_tagged_school_year.deactivate_student');
+        
+    });
+
+    Route::group(['prefix' => 'student-discount-list'], function () {
+        Route::get('', 'Admin\StudentDiscountList@index')->name('admin.student_discount_list.index');
+        Route::post('list-data', 'Admin\StudentDiscountList@list_data')->name('admin.student_discount_list.list_data');
         
     });
 });
@@ -79,6 +103,9 @@ Route::group(['prefix' => 'reports', 'middleware' => 'auth'], function () {
         
         Route::post('received-payments-summary-report', 'Reports\ReceivedPaymentsController@received_payments_summary_report')->name('reports.receivedpayments.received_payments_summary_report');
         
+        Route::post('edit-payment-modal', 'Reports\ReceivedPaymentsController@edit_payment_modal')->name('reports.receivedpayments.edit_payment_modal');
+        Route::post('save-edit-entry', 'Reports\ReceivedPaymentsController@save_edit_entry')->name('reports.receivedpayments.save_edit_entry');
+        Route::post('delete-entry', 'Reports\ReceivedPaymentsController@delete_entry')->name('reports.receivedpayments.delete_entry');
     });
     Route::group(['prefix' => 'monthly-payment-monitor'], function () {
         Route::get('', 'Reports\MonthlyPaymentMonitorController@index')->name('reports.monthly_payment_monitor.index');

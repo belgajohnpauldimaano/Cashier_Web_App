@@ -47,4 +47,9 @@ class Student extends Model
     {
         return $this->hasOne(AdditionalFeePayment::class, 'student_id', 'id');
     }
+
+    public function student_school_year_tag ()
+    {
+        return $this->hasOne(StudentSchoolYearTag::class, 'student_id', 'id');
+    }
 }

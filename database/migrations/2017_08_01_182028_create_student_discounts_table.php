@@ -19,6 +19,7 @@ class CreateStudentDiscountsTable extends Migration
             $table->integer('discount_id')->unsigned();
             $table->integer('created_by')->unsigned();
             $table->string('school_year', 20);
+            $table->integer('school_year_id')->unsigned();
             $table->tinyInteger('status')->default('1');
             $table->timestamps();
         });

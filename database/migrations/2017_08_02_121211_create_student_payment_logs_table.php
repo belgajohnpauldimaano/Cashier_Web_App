@@ -21,6 +21,7 @@ class CreateStudentPaymentLogsTable extends Migration
             $table->dateTime('received_date')->nullable();
             $table->string('or_number', 100)->nullable();
             $table->integer('received_by')->unsigned();
+            $table->integer('school_year_id')->unsigned();
             $table->timestamps();
         });
     }

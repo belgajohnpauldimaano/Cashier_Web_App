@@ -126,19 +126,24 @@
                                     $total_additional_payment   += $student->additional_fee_payment->pe_uniform;
                                     $total_additional_payment   += $student->additional_fee_payment->school_uniform;
 
-                                    $over_all_books             += $student->additional_fee_payment->books;
+                                    $over_all_books             += $student->additional_fee_payment->books  - $student->additional_fee_payment->book_remarks;
                                     $over_all_speech_lab        += $student->additional_fee_payment->speech_lab;
                                     $over_all_pe_uniform        += $student->additional_fee_payment->pe_uniform;
                                     $over_all_school_uniform    += $student->additional_fee_payment->school_uniform;
                                 }
  
                                 $outstanding_balance            = $total_additional_fee - $total_additional_payment;
+                                
+                                if ($student->status == 0)
+                                {
+                                    $outstanding_balance = 0;
+                                }
                                 $over_all_total_payment         += $total_additional_payment;
                                 $over_all_total_outstanding     += $outstanding_balance;
                             ?>
                             <tr>
                                 <td>
-                                    {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
+                                    {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
                                 </td>
                                 <td>
                                     @if ($student->grade)
@@ -153,7 +158,7 @@
                                 <td class="text-right">
                                     @if ($student->additional_fee_payment)
                                         <span class="{{ $individual_fee[0] > $student->additional_fee_payment->books ? 'text-red' : 'text-green'}}">
-                                            {{ a_number_format($student->additional_fee_payment->books) }}
+                                            {{ a_number_format($student->additional_fee_payment->books  - $student->additional_fee_payment->book_remarks) }}
                                         </span>
                                     @endif
                                 </td>
@@ -188,10 +193,14 @@
                                     <strong class="text-blue">{{ a_number_format($outstanding_balance) }}</strong>
                                 </td>    
                                 <td class="">
-                                    @if ($outstanding_balance > 0)
-                                        <strong class="text-red">Unpaid</strong>
+                                    @if ($student->status == 0)
+                                        <span class="text-red">Inactive</span>
                                     @else
-                                        <strong class="text-green">Paid</strong>
+                                        @if ($outstanding_balance > 0)
+                                            <strong class="text-red">Unpaid</strong>
+                                        @else
+                                            <strong class="text-green">Paid</strong>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

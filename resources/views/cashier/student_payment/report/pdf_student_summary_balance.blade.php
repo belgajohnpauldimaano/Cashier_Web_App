@@ -71,7 +71,7 @@
                 $over_all_add_fee = 0;
                 $over_all_add_paid_fee = 0;
                 $over_outstanding_balace = 0;
-
+                $over_all_gov_subsidy = 0;
             ?>
             <table class="table table-bordered">
                 <tr>
@@ -80,6 +80,7 @@
                     <th>Section</th>
                     <th>Tuition</th>
                     <th>Discount</th>
+                    <th>Gov't Subsidy</th>
                     <th>Net Tuition</th>
                     <th>Tuition Paid Fees</th>
                     <th>Outstanding Balance</th>
@@ -117,16 +118,23 @@
                             $outstanding_balance = 0;
                         }
 
+                        if ($student->status == 0)
+                        {
+                            $outstanding_balance = 0;
+                        }
+                        
                         $over_all_tuition_sum += $tuition_fee;
                         $over_all_discount_sum += $discount;
                         $over_all_net_tuition += $net_tuition;
-                        //$over_all_paid_fee += $paid_fee;
+                        $over_all_paid_fee += $paid_fee;
                         //$over_all_add_paid_fee += $add_paid_fee;
                         $over_outstanding_balace += $outstanding_balance;
+                        $over_all_gov_subsidy += $student->tuition[0]->gov_subsidy;
                     ?>
                     <tr>
                         <td>
-                            {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}
+                            {{--  {{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}  --}}
+                            {{ $student->student_info->last_name }}, {{ $student->student_info->first_name }} {{ $student->student_info->middle_name }}
                         </td>
                         <td>
                             @if ($student->grade)
@@ -149,13 +157,18 @@
                             @endif
                         </td>
                         <td class="text-right">
+                            @if ($student->grade_tuition)
+                                {{ a_number_format($student->tuition[0]->gov_subsidy) }}
+                            @endif       
+                        </td>
+                        <td class="text-right">
                             @if ($student->discount_list)
                                 {{ a_number_format($net_tuition) }}
                             @endif
                         </td>
                         <td class="text-right">
                             @if ($student->tuition)
-                                {{ a_number_format( $paid_fee) }}
+                                {{ a_number_format($paid_fee) }}
                             @endif
                         </td>
                         <td class="text-danger text-right">
@@ -173,7 +186,7 @@
                             @endif
                         </td>
                         <td class="text-right">
-                                {{ a_number_format($add_paid_fee ) }}
+                                {{ a_number_format($add_paid_fee) }}
                         </td>  --}}
                     </tr>
                 @endforeach
@@ -181,6 +194,7 @@
                         <td colspan="3">Total</td>
                         <td class="text-right">{{ a_number_format($over_all_tuition_sum) }}</td>
                         <td class="text-right">{{ a_number_format($over_all_discount_sum) }}</td>
+                        <td class="text-right">{{ a_number_format($over_all_gov_subsidy) }}</td>
                         <td class="text-right">{{ a_number_format($over_all_net_tuition) }}</td>
                         <td class="text-right">{{ a_number_format($over_all_paid_fee) }}</td>
                         <td class="text-right">{{ a_number_format($over_outstanding_balace) }}</td>
